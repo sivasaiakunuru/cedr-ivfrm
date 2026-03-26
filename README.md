@@ -3,7 +3,7 @@
 
 ## 🎓 Semester Project - Team Cyber-Torque
 
-**Status:** ✅ COMPLETE | **Standard:** ISO/SAE 21434 | **Institution:** [Your University]
+**Status:** ✅ COMPLETE | **Standard:** ISO/SAE 21434 | **Institution:** St Clair
 
 ---
 
