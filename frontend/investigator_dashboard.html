@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEDR - Cybersecurity Event Data Recorder</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --success: #28a745;
+            --dark: #1a1d29;
+            --darker: #12141d;
+            --card: #1e2130;
+            --text: #e4e6eb;
+            --text-muted: #8b949e;
+            --border: #2d3748;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--darker);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--danger), #ff6b6b);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .logo h1 {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .logo span {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-danger { background: rgba(220, 53, 69, 0.2); color: #ff6b6b; border: 1px solid rgba(220, 53, 69, 0.3); }
+        .badge-warning { background: rgba(255, 193, 7, 0.2); color: #ffc107; border: 1px solid rgba(255, 193, 7, 0.3); }
+
+        .nav {
+            display: flex;
+            gap: 4px;
+            padding: 0 2rem;
+            background: var(--darker);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-btn {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            color: var(--text);
+            border-bottom-color: var(--danger);
+        }
+
+        .main {
+            padding: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .alert-banner {
+            background: rgba(220, 53, 69, 0.1);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        .alert-banner.active { display: flex; }
+        .alert-banner.critical { background: rgba(220, 53, 69, 0.15); }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .stat-title {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .stat-icon {
+            font-size: 1.5rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-change {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .search-form {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr) auto;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--darker);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 0.875rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-table th {
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        .data-table tr:hover {
+            background: rgba(255,255,255,0.02);
+        }
+
+        .severity {
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .severity-critical { background: rgba(220, 53, 69, 0.2); color: #ff6b6b; }
+        .severity-high { background: rgba(255, 193, 7, 0.2); color: #ffc107; }
+        .severity-medium { background: rgba(255, 193, 7, 0.15); color: #ffca2c; }
+        .severity-low { background: rgba(40, 167, 69, 0.2); color: #28a745; }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .chain-visual {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 1rem;
+            background: var(--darker);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow-x: auto;
+        }
+
+        .chain-block {
+            min-width: 150px;
+            padding: 0.75rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            text-align: center;
+            font-size: 0.75rem;
+        }
+
+        .chain-block.valid {
+            border-color: var(--success);
+        }
+
+        .chain-arrow {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 1200px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .grid-2 { grid-template-columns: 1fr; }
+            .search-form { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">🔒</div>
+            <div>
+                <h1>CEDR Forensic Portal</h1>
+                <span>Cybersecurity Event Data Recorder</span>
+            </div>
+        </div>
+        <div class="user-info">
+            <span class="badge badge-danger">TOP SECRET</span>
+            <span id="investigator-name">Investigator</span>
+        </div>
+    </header>
+
+    <nav class="nav">
+        <button class="nav-btn active" onclick="showTab('overview')">Overview</button>
+        <button class="nav-btn" onclick="showTab('events')">Event Search</button>
+        <button class="nav-btn" onclick="showTab('forensics')">Forensic Reports</button>
+        <button class="nav-btn" onclick="showTab('correlations')">Correlations</button>
+        <button class="nav-btn" onclick="showTab('chain')">Chain of Custody</button>
+    </nav>
+
+    <main class="main">
+        <!-- Critical Alert Banner -->
+        <div id="critical-alert" class="alert-banner critical">
+            <strong>🚨 CRITICAL ALERT:</strong>
+            <span id="alert-message">Coordinated replay attack detected across 3 vehicles</span>
+        </div>
+
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">Total Vehicles</span>
+                        <span class="stat-icon">🚗</span>
+                    </div>
+                    <div class="stat-value" id="stat-vehicles">-</div>
+                    <div class="stat-change">Connected to CEDR</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">Security Events</span>
+                        <span class="stat-icon">⚠️</span>
+                    </div>
+                    <div class="stat-value" id="stat-events">-</div>
+                    <div class="stat-change">Last 30 days</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">Correlations</span>
+                        <span class="stat-icon">🔗</span>
+                    </div>
+                    <div class="stat-value" id="stat-correlations">-</div>
+                    <div class="stat-change">Fleet-wide patterns</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">Critical Alerts</span>
+                        <span class="stat-icon">🔴</span>
+                    </div>
+                    <div class="stat-value" id="stat-critical">-</div>
+                    <div class="stat-change">Require immediate attention</div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Event Distribution</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="eventChart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Severity Breakdown</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="severityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Event Search Tab -->
+        <div id="events" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Search Forensic Events</h3>
+                </div>
+                <div class="card-body">
+                    <div class="search-form">
+                        <div class="form-group">
+                            <label>Vehicle ID</label>
+                            <input type="text" class="form-control" id="search-vehicle" placeholder="e.g., VEH-001">
+                        </div>
+                        <div class="form-group">
+                            <label>Event Type</label>
+                            <select class="form-control" id="search-type">
+                                <option value="">All Types</option>
+                                <option value="INTRUSION_DETECTED">Intrusion</option>
+                                <option value="REPLAY_ATTACK">Replay Attack</option>
+                                <option value="UNAUTHORIZED_ACCESS">Unauthorized Access</option>
+                                <option value="ANOMALY_HIGH">Anomaly</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Severity</label>
+                            <select class="form-control" id="search-severity">
+                                <option value="">All Severities</option>
+                                <option value="CRITICAL">Critical</option>
+                                <option value="HIGH">High</option>
+                                <option value="MEDIUM">Medium</option>
+                                <option value="LOW">Low</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Time Range</label>
+                            <select class="form-control" id="search-time">
+                                <option value="1h">Last Hour</option>
+                                <option value="24h">Last 24 Hours</option>
+                                <option value="7d">Last 7 Days</option>
+                                <option value="30d">Last 30 Days</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: flex-end;">
+                            <button class="btn btn-primary" onclick="searchEvents()">Search</button>
+                        </div>
+                    </div>
+
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Vehicle</th>
+                                <th>Event Type</th>
+                                <th>Severity</th>
+                                <th>Source</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="events-table-body">
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: var(--text-muted);">
+                                    Use the search form above to query forensic events
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Forensics Tab -->
+        <div id="forensics" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Generate Forensic Report</h3>
+                </div>
+                <div class="card-body">
+                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 1rem; margin-bottom: 1.5rem;">
+                        <div class="form-group">
+                            <label>Vehicle ID</label>
+                            <input type="text" class="form-control" id="report-vehicle" placeholder="Enter vehicle ID">
+                        </div>
+                        <div class="form-group">
+                            <label>Start Date</label>
+                            <input type="date" class="form-control" id="report-start">
+                        </div>
+                        <div class="form-group">
+                            <label>End Date</label>
+                            <input type="date" class="form-control" id="report-end">
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: flex-end;">
+                            <button class="btn btn-primary" onclick="generateReport()">Generate Report</button>
+                        </div>
+                    </div>
+
+                    <div id="report-output" style="display: none;">
+                        <h4 style="margin-bottom: 1rem;">Forensic Report</h4>
+                        <div class="chain-visual" id="chain-visualization">
+                            <!-- Chain blocks will be inserted here -->
+                        </div>
+                        <div id="report-details"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Correlations Tab -->
+        <div id="correlations" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Fleet-Wide Attack Correlations</h3>
+                </div>
+                <div class="card-body">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Detected At</th>
+                                <th>Correlation Type</th>
+                                <th>Description</th>
+                                <th>Affected Vehicles</th>
+                                <th>Severity</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="correlations-table-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chain of Custody Tab -->
+        <div id="chain" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Chain of Custody Log</h3>
+                </div>
+                <div class="card-body">
+                    <p style="margin-bottom: 1rem; color: var(--text-muted);">
+                        All access to forensic data is logged for legal admissibility.
+                    </p>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Investigator</th>
+                                <th>Action</th>
+                                <th>Vehicle</th>
+                                <th>IP Address</th>
+                            </tr>
+                        </thead>
+                        <tbody id="custody-table-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Global state
+        let authToken = localStorage.getItem('cedr_token');
+        let socket;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!authToken) {
+                // For demo, auto-login
+                loginDemo();
+            } else {
+                initDashboard();
+            }
+        });
+
+        function loginDemo() {
+            // Demo login - in production, show login form
+            fetch('/api/investigator/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    investigator_id: 'INV001',
+                    badge_number: 'BADGE-001'
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                authToken = data.token;
+                localStorage.setItem('cedr_token', authToken);
+                document.getElementById('investigator-name').textContent = data.investigator.name;
+                initDashboard();
+            });
+        }
+
+        function initDashboard() {
+            connectWebSocket();
+            loadStats();
+            initCharts();
+            loadCorrelations();
+            loadCustodyLog();
+        }
+
+        function connectWebSocket() {
+            socket = io('http://localhost:8080');
+
+            socket.on('connect', () => {
+                console.log('Connected to CEDR Cloud');
+            });
+
+            socket.on('critical_event', (data) => {
+                showCriticalAlert(data);
+            });
+
+            socket.on('correlation_alert', (data) => {
+                showCriticalAlert({
+                    event_type: data.type,
+                    description: data.description
+                });
+                loadCorrelations();
+            });
+        }
+
+        function showCriticalAlert(data) {
+            const banner = document.getElementById('critical-alert');
+            const message = document.getElementById('alert-message');
+            message.textContent = `${data.event_type}: ${data.description}`;
+            banner.classList.add('active');
+            
+            setTimeout(() => {
+                banner.classList.remove('active');
+            }, 10000);
+        }
+
+        function loadStats() {
+            fetch('/api/dashboard/stats')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('stat-vehicles').textContent = data.total_vehicles;
+                    document.getElementById('stat-events').textContent = data.total_events;
+                    document.getElementById('stat-correlations').textContent = data.total_correlations;
+                    document.getElementById('stat-critical').textContent = 
+                        data.severity_breakdown.CRITICAL || 0;
+                });
+        }
+
+        function initCharts() {
+            // Event distribution chart
+            const ctx1 = document.getElementById('eventChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['Intrusion', 'Replay', 'Unauthorized', 'Anomaly', 'Other'],
+                    datasets: [{
+                        label: 'Events',
+                        data: [12, 19, 8, 15, 5],
+                        backgroundColor: '#dc3545'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { color: '#8b949e' } },
+                        x: { ticks: { color: '#8b949e' } }
+                    }
+                }
+            });
+
+            // Severity chart
+            const ctx2 = document.getElementById('severityChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Critical', 'High', 'Medium', 'Low'],
+                    datasets: [{
+                        data: [5, 15, 25, 14],
+                        backgroundColor: ['#dc3545', '#ffc107', '#ffca2c', '#28a745']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: '#e4e6eb' } }
+                    }
+                }
+            });
+        }
+
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function searchEvents() {
+            const vehicle = document.getElementById('search-vehicle').value;
+            const type = document.getElementById('search-type').value;
+            const severity = document.getElementById('search-severity').value;
+
+            fetch('/api/investigator/events/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify({
+                    vehicle_id: vehicle,
+                    event_type: type,
+                    severity: severity
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById('events-table-body');
+                tbody.innerHTML = data.events.map(e => `
+                    <tr>
+                        <td>${new Date(e.timestamp * 1000).toLocaleString()}</td>
+                        <td>${e.vehicle_id}</td>
+                        <td>${e.event_type}</td>
+                        <td><span class="severity severity-${e.severity.toLowerCase()}">${e.severity}</span></td>
+                        <td>${e.source}</td>
+                        <td>${e.chain_valid ? '✓ Valid' : '✗ Compromised'}</td>
+                    </tr>
+                `).join('');
+            });
+        }
+
+        function generateReport() {
+            const vehicle = document.getElementById('report-vehicle').value;
+            if (!vehicle) {
+                alert('Please enter a vehicle ID');
+                return;
+            }
+
+            fetch(`/api/investigator/forensic-report/${vehicle}`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('report-output').style.display = 'block';
+                
+                // Show chain visualization
+                const chainDiv = document.getElementById('chain-visualization');
+                chainDiv.innerHTML = data.timeline.slice(0, 5).map((t, i) => `
+                    <div class="chain-block valid">
+                        <div>Block ${i + 1}</div>
+                        <div style="font-size: 0.65rem; color: var(--text-muted);">${t.hash}</div>
+                    </div>
+                    ${i < 4 ? '<div class="chain-arrow">→</div>' : ''}
+                `).join('');
+
+                // Show details
+                document.getElementById('report-details').innerHTML = `
+                    <div style="margin-top: 1.5rem;">
+                        <h4>Report ID: ${data.report_id}</h4>
+                        <p>Generated: ${new Date(data.generated_at).toLocaleString()}</p>
+                        <p>By: ${data.generated_by}</p>
+                        <p>Total Events: ${data.total_events}</p>
+                        <p>Integrity: ${data.integrity_verification.status}</p>
+                        
+                        <h4 style="margin-top: 1rem;">Event Summary</h4>
+                        <ul>
+                            ${Object.entries(data.event_summary).map(([k, v]) => 
+                                `<li>${k}: ${v}</li>`
+                            ).join('')}
+                        </ul>
+                    </div>
+                `;
+            });
+        }
+
+        function loadCorrelations() {
+            fetch('/api/investigator/correlations', {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            })
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById('correlations-table-body');
+                tbody.innerHTML = data.correlations.map(c => `
+                    <tr>
+                        <td>${new Date(c.created_at * 1000).toLocaleString()}</td>
+                        <td>${c.type}</td>
+                        <td>${c.description}</td>
+                        <td>${c.affected_vehicles.join(', ')}</td>
+                        <td><span class="severity severity-${c.severity.toLowerCase()}">${c.severity}</span></td>
+                        <td>${c.investigated ? 'Investigated' : 'Open'}</td>
+                    </tr>
+                `).join('');
+            });
+        }
+
+        function loadCustodyLog() {
+            fetch('/api/investigator/access-log', {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            })
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById('custody-table-body');
+                tbody.innerHTML = data.logs.map(l => `
+                    <tr>
+                        <td>${new Date(l.timestamp * 1000).toLocaleString()}</td>
+                        <td>${l.investigator_id}</td>
+                        <td>${l.action}</td>
+                        <td>${l.vehicle_id || '-'}</td>
+                        <td>${l.ip_address}</td>
+                    </tr>
+                `).join('');
+            });
+        }
+    </script>
+</body>
+</html>
