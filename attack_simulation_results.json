@@ -1,0 +1,184 @@
+{
+  "test_run_id": "TEST-1774551310",
+  "started_at": "2026-03-26T18:55:10.369463+00:00",
+  "scenarios_executed": [
+    {
+      "name": "CAN Bus Flooding Attack",
+      "category": "network",
+      "severity": "CRITICAL",
+      "description": "Flooding CAN bus with high-frequency messages causing denial of service",
+      "attack_vector": "OBD-II port or compromised ECU",
+      "mitre_technique": "T0830",
+      "events_count": 30,
+      "detection_time_ms": 3009
+    },
+    {
+      "name": "CAN Message Injection",
+      "category": "network",
+      "severity": "CRITICAL",
+      "description": "Injecting spoofed CAN messages to control vehicle functions",
+      "attack_vector": "Compromised diagnostic tool",
+      "mitre_technique": "T0831",
+      "events_count": 6,
+      "detection_time_ms": 3001
+    },
+    {
+      "name": "CAN Replay Attack",
+      "category": "network",
+      "severity": "HIGH",
+      "description": "Recording and replaying valid CAN messages",
+      "attack_vector": "Network sniffing + replay",
+      "mitre_technique": "T0832",
+      "events_count": 5,
+      "detection_time_ms": 1501
+    },
+    {
+      "name": "ECU Spoofing",
+      "category": "network",
+      "severity": "HIGH",
+      "description": "Masquerading as legitimate ECU on the network",
+      "attack_vector": "Compromised ECU or external device",
+      "mitre_technique": "T0833",
+      "events_count": 6,
+      "detection_time_ms": 3001
+    },
+    {
+      "name": "Firmware Extraction",
+      "category": "ecu_firmware",
+      "severity": "HIGH",
+      "description": "Extracting firmware from ECU for reverse engineering",
+      "attack_vector": "JTAG/debug interface access",
+      "mitre_technique": "T0841",
+      "events_count": 6,
+      "detection_time_ms": 3001
+    },
+    {
+      "name": "Malicious Firmware Update",
+      "category": "ecu_firmware",
+      "severity": "CRITICAL",
+      "description": "Installing modified firmware to alter ECU behavior",
+      "attack_vector": "Compromised update mechanism",
+      "mitre_technique": "T0842",
+      "events_count": 2,
+      "detection_time_ms": 0
+    },
+    {
+      "name": "ECU Reset Attack",
+      "category": "ecu_firmware",
+      "severity": "MEDIUM",
+      "description": "Forcing ECU reset to disrupt operations",
+      "attack_vector": "Malformed diagnostic messages",
+      "mitre_technique": "T0843",
+      "events_count": 6,
+      "detection_time_ms": 3002
+    },
+    {
+      "name": "Bluetooth Exploitation",
+      "category": "communication",
+      "severity": "HIGH",
+      "description": "Exploiting Bluetooth stack vulnerabilities",
+      "attack_vector": "Paired malicious device",
+      "mitre_technique": "T0851",
+      "events_count": 6,
+      "detection_time_ms": 3002
+    },
+    {
+      "name": "Wi-Fi Hotspot Exploitation",
+      "category": "communication",
+      "severity": "HIGH",
+      "description": "Attacking vehicle Wi-Fi hotspot",
+      "attack_vector": "Unauthorized network access",
+      "mitre_technique": "T0852",
+      "events_count": 6,
+      "detection_time_ms": 3002
+    },
+    {
+      "name": "Cellular Man-in-the-Middle",
+      "category": "communication",
+      "severity": "CRITICAL",
+      "description": "Intercepting cellular communications to backend",
+      "attack_vector": "Fake base station or compromised carrier",
+      "mitre_technique": "T0853",
+      "events_count": 4,
+      "detection_time_ms": 3000
+    },
+    {
+      "name": "Telematics System Bypass",
+      "category": "communication",
+      "severity": "HIGH",
+      "description": "Bypassing telematics authentication",
+      "attack_vector": "Stolen credentials or session hijacking",
+      "mitre_technique": "T0854",
+      "events_count": 6,
+      "detection_time_ms": 3002
+    },
+    {
+      "name": "Infotainment System Exploitation",
+      "category": "application",
+      "severity": "MEDIUM",
+      "description": "Exploiting IVI vulnerabilities for lateral movement",
+      "attack_vector": "Malicious media file or app",
+      "mitre_technique": "T0861",
+      "events_count": 6,
+      "detection_time_ms": 3002
+    },
+    {
+      "name": "Companion App Exploitation",
+      "category": "application",
+      "severity": "HIGH",
+      "description": "Exploiting mobile app to control vehicle",
+      "attack_vector": "Compromised mobile device",
+      "mitre_technique": "T0862",
+      "events_count": 6,
+      "detection_time_ms": 3001
+    },
+    {
+      "name": "OBD-II Port Injection",
+      "category": "physical",
+      "severity": "CRITICAL",
+      "description": "Direct injection via OBD-II diagnostic port",
+      "attack_vector": "Physical access + diagnostic tool",
+      "mitre_technique": "T0871",
+      "events_count": 6,
+      "detection_time_ms": 3001
+    },
+    {
+      "name": "Key Fob Relay Attack",
+      "category": "physical",
+      "severity": "HIGH",
+      "description": "Relaying key fob signal to unlock/steal vehicle",
+      "attack_vector": "RF relay equipment",
+      "mitre_technique": "T0872",
+      "events_count": 2,
+      "detection_time_ms": 0
+    },
+    {
+      "name": "TPMS Exploitation",
+      "category": "physical",
+      "severity": "LOW",
+      "description": "Exploiting tire pressure monitoring system",
+      "attack_vector": "Wireless tire sensor spoofing",
+      "mitre_technique": "T0873",
+      "events_count": 6,
+      "detection_time_ms": 3001
+    }
+  ],
+  "total_events": 109,
+  "detection_summary": {
+    "by_severity": {
+      "CRITICAL": 5,
+      "HIGH": 8,
+      "MEDIUM": 2,
+      "LOW": 1
+    },
+    "by_category": {
+      "network": 4,
+      "ecu_firmware": 3,
+      "communication": 4,
+      "application": 2,
+      "physical": 3
+    },
+    "average_detection_time_ms": 2532.875
+  },
+  "completed_at": "2026-03-26T18:55:50.905429+00:00"
+}

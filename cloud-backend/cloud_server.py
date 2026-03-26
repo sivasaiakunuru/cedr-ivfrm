@@ -443,6 +443,94 @@ def get_forensic_report(vehicle_id):
     
     return jsonify(report), 200
 
+
+@app.route('/api/investigator/forensic-report/<vehicle_id>/download', methods=['GET'])
+@require_investigator_auth
+def download_forensic_report(vehicle_id):
+    """
+    Download forensic report as JSON or PDF.
+    Query params: format=json|pdf
+    """
+    report_format = request.args.get('format', 'json')
+    
+    # Log access
+    log_access(
+        investigator_id=request.investigator['investigator_id'],
+        action='DOWNLOAD_FORENSIC_REPORT',
+        vehicle_id=vehicle_id,
+        ip_address=request.remote_addr
+    )
+    
+    conn = sqlite3.connect('/tmp/cedr_cloud.db')
+    cursor = conn.cursor()
+    
+    # Get all events for vehicle
+    cursor.execute('''
+        SELECT * FROM vehicle_events 
+        WHERE vehicle_id = ? 
+        ORDER BY timestamp
+    ''', (vehicle_id,))
+    
+    events = cursor.fetchall()
+    conn.close()
+    
+    # Generate report
+    report = {
+        'report_id': hashlib.sha256(f"{vehicle_id}{time.time()}".encode()).hexdigest()[:16],
+        'generated_at': datetime.now(timezone.utc).isoformat(),
+        'generated_by': request.investigator['investigator_id'],
+        'vehicle_id': vehicle_id,
+        'total_events': len(events),
+        'event_summary': {},
+        'severity_breakdown': {},
+        'events': [],
+        'integrity_verification': verify_cloud_chain(vehicle_id),
+        'chain_of_custody': {
+            'prepared_by': request.investigator['investigator_id'],
+            'prepared_at': datetime.now(timezone.utc).isoformat(),
+            'system': 'CEDR Cloud Forensic Platform',
+            'standard': 'ISO/SAE 21434'
+        }
+    }
+    
+    # Event summary
+    for event in events:
+        event_type = event[3]
+        severity = event[4]
+        
+        report['event_summary'][event_type] = report['event_summary'].get(event_type, 0) + 1
+        report['severity_breakdown'][severity] = report['severity_breakdown'].get(severity, 0) + 1
+        
+        report['events'].append({
+            'id': event[0],
+            'timestamp': event[2],
+            'event_type': event[3],
+            'severity': event[4],
+            'source': event[5],
+            'data': json.loads(event[6]) if event[6] else {},
+            'hash_chain': event[7],
+            'signature': event[8],
+            'received_at': event[9]
+        })
+    
+    if report_format == 'json':
+        # Return as downloadable JSON file
+        import tempfile
+        temp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False)
+        json.dump(report, temp_file, indent=2)
+        temp_file.close()
+        
+        return send_file(
+            temp_file.name,
+            mimetype='application/json',
+            as_attachment=True,
+            download_name=f'CEDR_Forensic_Report_{vehicle_id}_{datetime.now().strftime("%Y%m%d_%H%M%S")}.json'
+        )
+    
+    else:
+        return jsonify({'error': 'Invalid format. Use json'}), 400
+
+
 @app.route('/api/investigator/correlations', methods=['GET'])
 @require_investigator_auth
 def get_correlations():

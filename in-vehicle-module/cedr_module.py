@@ -27,6 +27,28 @@ import base64
 import queue
 import logging
 
+# Import new modules
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+try:
+    from capture.packet_capture import PacketCapture
+    PACKET_CAPTURE_AVAILABLE = True
+except ImportError:
+    PACKET_CAPTURE_AVAILABLE = False
+
+try:
+    from v2x.v2x_security import V2XSecurityModule
+    V2X_AVAILABLE = True
+except ImportError:
+    V2X_AVAILABLE = False
+
+try:
+    from location.geolocation import GeolocationTracker
+    GEOLOCATION_AVAILABLE = True
+except ImportError:
+    GEOLOCATION_AVAILABLE = False
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -58,6 +80,32 @@ class CEDRModule:
         # Chain hash for tamper evidence (like blockchain)
         self.previous_hash = self._load_last_hash()
         
+        # Initialize optional modules
+        self.packet_capture = None
+        self.v2x_module = None
+        self.geolocation = None
+        
+        if PACKET_CAPTURE_AVAILABLE:
+            try:
+                self.packet_capture = PacketCapture(vehicle_id)
+                logger.info("Packet capture module initialized")
+            except Exception as e:
+                logger.warning(f"Failed to initialize packet capture: {e}")
+        
+        if V2X_AVAILABLE:
+            try:
+                self.v2x_module = V2XSecurityModule(vehicle_id)
+                logger.info("V2X security module initialized")
+            except Exception as e:
+                logger.warning(f"Failed to initialize V2X module: {e}")
+        
+        if GEOLOCATION_AVAILABLE:
+            try:
+                self.geolocation = GeolocationTracker(vehicle_id)
+                logger.info("Geolocation tracker initialized")
+            except Exception as e:
+                logger.warning(f"Failed to initialize geolocation: {e}")
+        
         # Configuration
         self.config = {
             'log_levels': ['CRITICAL', 'HIGH', 'MEDIUM'],
@@ -72,7 +120,10 @@ class CEDRModule:
                 'BUS_OVERFLOW'
             ],
             'batch_size': 10,
-            'upload_interval': 300  # 5 minutes
+            'upload_interval': 300,  # 5 minutes
+            'packet_capture_enabled': PACKET_CAPTURE_AVAILABLE,
+            'v2x_enabled': V2X_AVAILABLE,
+            'geolocation_enabled': GEOLOCATION_AVAILABLE
         }
         
         # Event counters for statistics
