@@ -9,7 +9,8 @@
 
 ## 📋 Executive Summary
 
-Modern connected vehicles face growing cyber threats, yet no standardized method exists to securely log digital security incidents. Current Event Data Recorders (EDRs) only capture physical crash data, leaving a critical forensic gap.
+Modern connected vehicles face growing cyber threats, yet no standardized method exists to securely log digital security incidents — current Event Data Recorders only capture physical crash data, leaving a critical forensic gap. Team Cyber-Torque is developing the Cybersecurity Event Data Recorder (CEDR), an embedded system that automatically records and protects tamper-evident vehicle security logs using cryptographic hash chaining, AES encryption, and real-time event transmission. By semester's end, we will deliver a functional prototype, validated test results, and a presentation demonstrating CEDR in action against simulated cyberattack scenarios, equipping investigators, automakers, and insurers with forensically sound evidence aligned with ISO/SAE21434 standards.
+
 
 **CEDR** is an embedded system that automatically records and protects tamper-evident vehicle security logs using:
 - 🔗 Cryptographic hash chaining (blockchain-style)
