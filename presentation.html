@@ -3,96 +3,171 @@
 <head>
  <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <meta name="description" content="CEDR - Cybersecurity Event Data Recorder for Connected Vehicles. ISO 21434 compliant, UN R155/R156 ready.">
  <title>CEDR-IVFRM - Cybersecurity Event Data Recorder</title>
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
  <style>
+ :root {
+ --primary: #0a2540;
+ --primary-light: #1e3a5f;
+ --secondary: #00d4aa;
+ --secondary-dark: #00b894;
+ --accent: #635bff;
+ --accent-light: #7c73ff;
+ --danger: #ff6b6b;
+ --warning: #ffd93d;
+ --info: #4dabf7;
+ --light: #f8f9fa;
+ --dark: #0a2540;
+ --gradient-primary: linear-gradient(135deg, #0a2540 0%, #1e3a5f 50%, #0d1f33 100%);
+ --gradient-accent: linear-gradient(135deg, #635bff 0%, #00d4aa 100%);
+ --gradient-danger: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%);
+ --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+ --shadow-md: 0 4px 12px rgba(0,0,0,0.15);
+ --shadow-lg: 0 8px 30px rgba(0,0,0,0.2);
+ --shadow-glow: 0 0 40px rgba(0,212,170,0.15);
+ }
+
  * {
  margin: 0;
  padding: 0;
  box-sizing: border-box;
  }
 
- :root {
- --primary: #0a2540;
- --secondary: #00d4aa;
- --accent: #635bff;
- --danger: #ff6b6b;
- --warning: #ffd93d;
- --light: #f6f9fc;
- --dark: #0a2540;
- --gradient: linear-gradient(135deg, #0a2540 0%, #1e3a5f 100%);
- --gradient-accent: linear-gradient(135deg, #635bff 0%, #00d4aa 100%);
+ html {
+ scroll-behavior: smooth;
  }
 
  body {
- font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
- background: var(--dark);
+ font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+ background: var(--primary);
  color: white;
  overflow: hidden;
+ line-height: 1.6;
  }
 
+ /* Typography */
+ h1, h2, h3, h4 {
+ font-weight: 700;
+ line-height: 1.2;
+ }
+
+ h1 {
+ font-size: clamp(2.5rem, 5vw, 4rem);
+ background: linear-gradient(135deg, #fff 0%, var(--secondary) 50%, var(--accent-light) 100%);
+ -webkit-background-clip: text;
+ -webkit-text-fill-color: transparent;
+ background-clip: text;
+ }
+
+ h2 {
+ font-size: clamp(1.8rem, 4vw, 2.8rem);
+ color: var(--secondary);
+ margin-bottom: 1.5rem;
+ }
+
+ h3 {
+ font-size: clamp(1.3rem, 3vw, 1.6rem);
+ font-weight: 600;
+ }
+
+ p {
+ font-size: clamp(1rem, 1.5vw, 1.2rem);
+ color: rgba(255,255,255,0.9);
+ line-height: 1.7;
+ }
+
+ /* Presentation Container */
  .presentation {
  width: 100vw;
  height: 100vh;
  position: relative;
+ background: var(--gradient-primary);
  }
 
+ /* Slide Base */
  .slide {
  position: absolute;
  width: 100%;
  height: 100%;
  display: none;
- padding: 60px;
- background: var(--gradient);
+ padding: clamp(1.5rem, 4vw, 4rem);
  opacity: 0;
- transition: opacity 0.5s ease;
+ transform: translateX(100px);
+ transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
  overflow-y: auto;
+ overflow-x: hidden;
  }
 
  .slide.active {
  display: flex;
  flex-direction: column;
  opacity: 1;
+ transform: translateX(0);
  }
 
- /* Navigation */
+ .slide.prev {
+ transform: translateX(-100px);
+ }
+
+ /* Enhanced Navigation */
  .nav-controls {
  position: fixed;
- bottom: 30px;
- right: 30px;
+ bottom: clamp(1rem, 3vw, 2rem);
+ right: clamp(1rem, 3vw, 2rem);
  display: flex;
- gap: 10px;
+ gap: 0.75rem;
  z-index: 1000;
  }
 
  .nav-btn {
- width: 50px;
- height: 50px;
+ width: clamp(44px, 6vw, 56px);
+ height: clamp(44px, 6vw, 56px);
  border-radius: 50%;
  border: 2px solid var(--secondary);
- background: rgba(255,255,255,0.1);
+ background: rgba(255,255,255,0.08);
  color: white;
  cursor: pointer;
  display: flex;
  align-items: center;
  justify-content: center;
- font-size: 20px;
- transition: all 0.3s;
- backdrop-filter: blur(10px);
+ font-size: clamp(1rem, 2vw, 1.5rem);
+ transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+ backdrop-filter: blur(20px);
+ -webkit-backdrop-filter: blur(20px);
+ box-shadow: var(--shadow-md);
  }
 
  .nav-btn:hover {
  background: var(--secondary);
  color: var(--dark);
- transform: scale(1.1);
+ transform: scale(1.15) translateY(-2px);
+ box-shadow: var(--shadow-glow);
+ }
+
+ .nav-btn:active {
+ transform: scale(0.95);
+ }
+
+ .nav-btn:disabled {
+ opacity: 0.4;
+ cursor: not-allowed;
  }
 
  .slide-counter {
  position: fixed;
- bottom: 30px;
- left: 30px;
- font-size: 14px;
+ bottom: clamp(1rem, 3vw, 2rem);
+ left: clamp(1rem, 3vw, 2rem);
+ font-size: clamp(0.8rem, 1.5vw, 0.9rem);
  color: rgba(255,255,255,0.6);
  z-index: 1000;
+ font-family: 'JetBrains Mono', monospace;
+ background: rgba(0,0,0,0.3);
+ padding: 0.5rem 1rem;
+ border-radius: 20px;
+ backdrop-filter: blur(10px);
  }
 
  .progress-bar {
@@ -101,204 +176,385 @@
  left: 0;
  height: 4px;
  background: var(--gradient-accent);
- transition: width 0.3s;
+ transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
  z-index: 1000;
+ box-shadow: 0 0 10px rgba(0,212,170,0.5);
  }
 
- /* Typography */
- h1 {
- font-size: 3.5rem;
- font-weight: 700;
- margin-bottom: 20px;
- background: linear-gradient(135deg, #fff 0%, var(--secondary) 100%);
- -webkit-background-clip: text;
- -webkit-text-fill-color: transparent;
- line-height: 1.2;
+ /* Skip to slide input */
+ .slide-jumper {
+ position: fixed;
+ bottom: clamp(1rem, 3vw, 2rem);
+ left: 50%;
+ transform: translateX(-50%);
+ z-index: 1000;
+ display: flex;
+ align-items: center;
+ gap: 0.5rem;
+ opacity: 0;
+ transition: opacity 0.3s;
+ pointer-events: none;
  }
 
- h2 {
- font-size: 2.5rem;
- font-weight: 600;
- margin-bottom: 30px;
- color: var(--secondary);
+ .slide-jumper.visible {
+ opacity: 1;
+ pointer-events: auto;
  }
 
- h3 {
- font-size: 1.8rem;
- font-weight: 600;
- margin-bottom: 20px;
+ .slide-jumper input {
+ width: 50px;
+ padding: 0.4rem;
+ border: 1px solid var(--secondary);
+ background: rgba(0,0,0,0.5);
  color: white;
+ border-radius: 6px;
+ text-align: center;
+ font-family: 'JetBrains Mono', monospace;
  }
 
- p, li {
- font-size: 1.2rem;
- line-height: 1.6;
- color: rgba(255,255,255,0.9);
- margin-bottom: 15px;
+ /* Keyboard hint */
+ .keyboard-hint {
+ position: fixed;
+ top: 1rem;
+ right: 1rem;
+ font-size: 0.75rem;
+ color: rgba(255,255,255,0.4);
+ z-index: 1000;
+ opacity: 0;
+ transition: opacity 0.3s;
+ }
+
+ body:hover .keyboard-hint {
+ opacity: 1;
  }
 
  /* Layout Components */
  .two-column {
  display: grid;
- grid-template-columns: 1fr 1fr;
- gap: 40px;
- align-items: center;
+ grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+ gap: clamp(1.5rem, 3vw, 3rem);
+ align-items: start;
  flex: 1;
  }
 
  .three-column {
  display: grid;
- grid-template-columns: repeat(3, 1fr);
- gap: 30px;
- margin-top: 30px;
+ grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+ gap: clamp(1rem, 2vw, 2rem);
+ margin-top: 1.5rem;
  }
 
+ .four-column {
+ display: grid;
+ grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+ gap: 1.5rem;
+ margin-top: 1.5rem;
+ }
+
+ /* Cards */
  .card {
- background: rgba(255,255,255,0.05);
- border: 1px solid rgba(255,255,255,0.1);
+ background: rgba(255,255,255,0.04);
+ border: 1px solid rgba(255,255,255,0.08);
  border-radius: 16px;
- padding: 30px;
- backdrop-filter: blur(10px);
- transition: transform 0.3s, box-shadow 0.3s;
+ padding: clamp(1.25rem, 2.5vw, 2rem);
+ backdrop-filter: blur(20px);
+ -webkit-backdrop-filter: blur(20px);
+ transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+ position: relative;
+ overflow: hidden;
+ }
+
+ .card::before {
+ content: '';
+ position: absolute;
+ top: 0;
+ left: 0;
+ right: 0;
+ height: 3px;
+ background: var(--gradient-accent);
+ transform: scaleX(0);
+ transition: transform 0.4s;
  }
 
  .card:hover {
- transform: translateY(-5px);
- box-shadow: 0 20px 40px rgba(0,0,0,0.3);
- border-color: var(--secondary);
+ transform: translateY(-8px);
+ box-shadow: var(--shadow-lg), var(--shadow-glow);
+ border-color: rgba(0,212,170,0.3);
+ }
+
+ .card:hover::before {
+ transform: scaleX(1);
+ }
+
+ .card-icon {
+ font-size: 2.5rem;
+ margin-bottom: 1rem;
+ display: block;
  }
 
  .stat-card {
  text-align: center;
- padding: 40px 20px;
+ padding: clamp(2rem, 4vw, 3rem) 1.5rem;
  }
 
  .stat-number {
- font-size: 3rem;
- font-weight: 700;
+ font-size: clamp(2.5rem, 5vw, 3.5rem);
+ font-weight: 800;
  color: var(--secondary);
  display: block;
+ line-height: 1;
+ margin-bottom: 0.5rem;
+ font-family: 'JetBrains Mono', monospace;
  }
 
  .stat-label {
- font-size: 0.9rem;
+ font-size: 0.85rem;
  color: rgba(255,255,255,0.7);
  text-transform: uppercase;
- letter-spacing: 1px;
+ letter-spacing: 1.5px;
+ font-weight: 500;
  }
 
- /* Special Elements */
+ .stat-sublabel {
+ font-size: 0.75rem;
+ color: rgba(255,255,255,0.5);
+ margin-top: 0.5rem;
+ }
+
+ /* Badges */
+ .badge-container {
+ display: flex;
+ flex-wrap: wrap;
+ gap: 0.75rem;
+ justify-content: center;
+ margin-top: 2rem;
+ }
+
  .badge {
- display: inline-block;
- padding: 8px 16px;
+ display: inline-flex;
+ align-items: center;
+ gap: 0.5rem;
+ padding: 0.6rem 1.2rem;
  background: var(--gradient-accent);
- border-radius: 20px;
+ border-radius: 50px;
  font-size: 0.85rem;
  font-weight: 600;
- margin: 5px;
+ box-shadow: var(--shadow-sm);
+ transition: all 0.3s;
  }
 
+ .badge:hover {
+ transform: scale(1.05);
+ box-shadow: var(--shadow-glow);
+ }
+
+ .badge-outline {
+ background: transparent;
+ border: 2px solid var(--secondary);
+ color: var(--secondary);
+ }
+
+ .badge-success {
+ background: rgba(0,212,170,0.15);
+ border: 1px solid var(--secondary);
+ color: var(--secondary);
+ }
+
+ /* Problem/Solution Items */
  .problem-grid {
  display: grid;
- grid-template-columns: repeat(2, 1fr);
- gap: 20px;
- margin: 30px 0;
+ grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+ gap: 1.25rem;
+ margin: 1.5rem 0;
+ }
+
+ .problem-item, .solution-item {
+ padding: 1.5rem;
+ border-radius: 12px;
+ position: relative;
+ transition: all 0.3s;
  }
 
  .problem-item {
- background: rgba(255,107,107,0.1);
+ background: linear-gradient(135deg, rgba(255,107,107,0.1) 0%, rgba(255,107,107,0.05) 100%);
  border-left: 4px solid var(--danger);
- padding: 20px;
- border-radius: 8px;
+ }
+
+ .problem-item:hover {
+ transform: translateX(5px);
+ box-shadow: 0 4px 20px rgba(255,107,107,0.2);
  }
 
  .solution-item {
- background: rgba(0,212,170,0.1);
+ background: linear-gradient(135deg, rgba(0,212,170,0.1) 0%, rgba(0,212,170,0.05) 100%);
  border-left: 4px solid var(--secondary);
- padding: 20px;
- border-radius: 8px;
  }
 
+ .solution-item:hover {
+ transform: translateX(5px);
+ box-shadow: 0 4px 20px rgba(0,212,170,0.2);
+ }
+
+ /* Architecture Container */
  .architecture-container {
- background: rgba(0,0,0,0.3);
- border-radius: 20px;
- padding: 40px;
- margin: 30px 0;
+ background: linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 100%);
+ border-radius: 24px;
+ padding: clamp(2rem, 4vw, 3rem);
+ margin: 1.5rem 0;
  border: 1px solid rgba(255,255,255,0.1);
+ position: relative;
  }
 
+ .architecture-container::before {
+ content: '';
+ position: absolute;
+ inset: 0;
+ border-radius: 24px;
+ padding: 1px;
+ background: linear-gradient(135deg, rgba(99,91,255,0.3), rgba(0,212,170,0.3));
+ -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+ mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+ -webkit-mask-composite: xor;
+ mask-composite: exclude;
+ pointer-events: none;
+ }
+
+ /* Tech Stack */
  .tech-stack {
  display: flex;
  flex-wrap: wrap;
- gap: 15px;
- margin: 20px 0;
+ gap: 0.75rem;
+ margin: 1.25rem 0;
  }
 
  .tech-item {
- background: rgba(99,91,255,0.2);
- border: 1px solid var(--accent);
- padding: 10px 20px;
+ background: rgba(99,91,255,0.15);
+ border: 1px solid rgba(99,91,255,0.4);
+ padding: 0.6rem 1.2rem;
  border-radius: 8px;
  font-size: 0.9rem;
+ font-weight: 500;
+ transition: all 0.3s;
  }
 
+ .tech-item:hover {
+ background: rgba(99,91,255,0.25);
+ transform: translateY(-2px);
+ }
+
+ /* Timeline */
  .timeline {
  position: relative;
- padding-left: 40px;
+ padding-left: 3rem;
+ max-width: 900px;
+ margin: 0 auto;
  }
 
  .timeline::before {
  content: '';
  position: absolute;
- left: 15px;
+ left: 11px;
  top: 0;
  bottom: 0;
- width: 2px;
- background: var(--secondary);
+ width: 3px;
+ background: linear-gradient(180deg, var(--secondary) 0%, var(--accent) 100%);
+ border-radius: 3px;
  }
 
  .timeline-item {
  position: relative;
- margin-bottom: 30px;
- padding: 20px;
- background: rgba(255,255,255,0.05);
- border-radius: 12px;
+ margin-bottom: 2rem;
+ padding: 1.5rem;
+ background: rgba(255,255,255,0.04);
+ border-radius: 16px;
+ border: 1px solid rgba(255,255,255,0.08);
+ transition: all 0.3s;
+ }
+
+ .timeline-item:hover {
+ background: rgba(255,255,255,0.08);
+ transform: translateX(10px);
  }
 
  .timeline-item::before {
  content: '';
  position: absolute;
- left: -33px;
- top: 25px;
- width: 12px;
- height: 12px;
+ left: -2.25rem;
+ top: 1.75rem;
+ width: 16px;
+ height: 16px;
  background: var(--secondary);
  border-radius: 50%;
+ border: 3px solid var(--primary);
+ box-shadow: 0 0 0 3px var(--secondary);
  }
 
+ .timeline-header {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ flex-wrap: wrap;
+ gap: 0.5rem;
+ margin-bottom: 0.5rem;
+ }
+
+ .timeline-title {
+ color: var(--secondary);
+ font-weight: 600;
+ }
+
+ .timeline-meta {
+ display: flex;
+ gap: 1rem;
+ font-size: 0.9rem;
+ color: rgba(255,255,255,0.7);
+ }
+
+ /* Tables */
  .cost-table {
  width: 100%;
- border-collapse: collapse;
- margin: 20px 0;
+ border-collapse: separate;
+ border-spacing: 0;
+ margin: 1.5rem 0;
+ font-size: clamp(0.85rem, 1.5vw, 1rem);
+ border-radius: 12px;
+ overflow: hidden;
  }
 
  .cost-table th, .cost-table td {
- padding: 15px;
+ padding: 1rem;
  text-align: left;
  border-bottom: 1px solid rgba(255,255,255,0.1);
  }
 
  .cost-table th {
- background: rgba(255,255,255,0.1);
+ background: rgba(0,212,170,0.15);
  font-weight: 600;
  color: var(--secondary);
+ text-transform: uppercase;
+ letter-spacing: 0.5px;
+ font-size: 0.8rem;
  }
 
- .highlight {
+ .cost-table tr:last-child td {
+ border-bottom: none;
+ }
+
+ .cost-table tr:hover td {
+ background: rgba(255,255,255,0.03);
+ }
+
+ .cost-table .highlight {
  color: var(--secondary);
  font-weight: 600;
  }
 
+ .cost-table .total-row {
+ background: rgba(0,212,170,0.1) !important;
+ font-weight: 600;
+ }
+
+ /* Center content */
  .center-content {
  text-align: center;
  display: flex;
@@ -306,150 +562,365 @@
  align-items: center;
  justify-content: center;
  height: 100%;
+ min-height: 60vh;
  }
 
  .logo-placeholder {
- width: 120px;
- height: 120px;
+ width: clamp(100px, 15vw, 140px);
+ height: clamp(100px, 15vw, 140px);
  background: var(--gradient-accent);
- border-radius: 24px;
+ border-radius: 28px;
  display: flex;
  align-items: center;
  justify-content: center;
- font-size: 2.5rem;
- font-weight: 700;
- margin-bottom: 30px;
- box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+ font-size: clamp(2rem, 5vw, 3rem);
+ font-weight: 800;
+ margin-bottom: 2rem;
+ box-shadow: var(--shadow-lg), var(--shadow-glow);
+ position: relative;
+ animation: float 3s ease-in-out infinite;
  }
 
+ @keyframes float {
+ 0%, 100% { transform: translateY(0); }
+ 50% { transform: translateY(-10px); }
+ }
+
+ .logo-placeholder::after {
+ content: '';
+ position: absolute;
+ inset: -3px;
+ border-radius: 30px;
+ background: var(--gradient-accent);
+ z-index: -1;
+ opacity: 0.5;
+ filter: blur(20px);
+ }
+
+ /* Images */
  .image-container {
  border-radius: 16px;
  overflow: hidden;
- box-shadow: 0 20px 40px rgba(0,0,0,0.3);
- margin: 20px 0;
+ box-shadow: var(--shadow-lg);
+ margin: 1.5rem 0;
+ position: relative;
+ }
+
+ .image-container::after {
+ content: '';
+ position: absolute;
+ inset: 0;
+ background: linear-gradient(180deg, transparent 60%, rgba(10,37,64,0.8) 100%);
+ pointer-events: none;
  }
 
  .image-container img {
  width: 100%;
  height: auto;
  display: block;
+ transition: transform 0.5s;
+ }
+
+ .image-container:hover img {
+ transform: scale(1.02);
+ }
+
+ /* Compliance badges */
+ .compliance-container {
+ display: flex;
+ flex-wrap: wrap;
+ justify-content: center;
+ gap: 1rem;
+ margin: 2rem 0;
  }
 
  .compliance-badge {
  display: inline-flex;
  align-items: center;
- gap: 10px;
- padding: 12px 20px;
+ gap: 0.75rem;
+ padding: 0.875rem 1.5rem;
  background: rgba(0,212,170,0.1);
- border: 1px solid var(--secondary);
- border-radius: 8px;
- margin: 10px;
+ border: 1px solid rgba(0,212,170,0.4);
+ border-radius: 50px;
+ font-size: 0.9rem;
+ font-weight: 500;
+ transition: all 0.3s;
+ }
+
+ .compliance-badge:hover {
+ background: rgba(0,212,170,0.2);
+ transform: translateY(-2px);
+ box-shadow: 0 4px 15px rgba(0,212,170,0.2);
  }
 
  .check-icon {
  color: var(--secondary);
  font-weight: bold;
+ font-size: 1.1rem;
  }
 
+ /* Feature lists */
  ul.feature-list {
  list-style: none;
  padding: 0;
  }
 
  ul.feature-list li {
- padding-left: 30px;
+ padding-left: 1.75rem;
  position: relative;
- margin-bottom: 15px;
+ margin-bottom: 0.875rem;
+ font-size: clamp(0.95rem, 1.5vw, 1.1rem);
  }
 
  ul.feature-list li::before {
- content: "▸";
+ content: "→";
  position: absolute;
  left: 0;
  color: var(--secondary);
  font-weight: bold;
  }
 
+ /* Risk matrix */
  .risk-matrix {
  display: grid;
- grid-template-columns: repeat(3, 1fr);
- gap: 15px;
- margin: 20px 0;
+ grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+ gap: 1rem;
+ margin: 1.5rem 0;
  }
 
  .risk-item {
- padding: 20px;
+ padding: 1.25rem;
  border-radius: 12px;
  text-align: center;
+ transition: all 0.3s;
  }
 
- .risk-high { background: rgba(255,107,107,0.2); border: 1px solid var(--danger); }
- .risk-med { background: rgba(255,217,61,0.2); border: 1px solid var(--warning); }
- .risk-low { background: rgba(0,212,170,0.2); border: 1px solid var(--secondary); }
+ .risk-item:hover {
+ transform: translateY(-5px);
+ }
 
+ .risk-high { 
+ background: linear-gradient(135deg, rgba(255,107,107,0.2) 0%, rgba(255,107,107,0.1) 100%); 
+ border: 1px solid var(--danger); 
+ }
+ .risk-med { 
+ background: linear-gradient(135deg, rgba(255,217,61,0.2) 0%, rgba(255,217,61,0.1) 100%); 
+ border: 1px solid var(--warning); 
+ }
+ .risk-low { 
+ background: linear-gradient(135deg, rgba(0,212,170,0.2) 0%, rgba(0,212,170,0.1) 100%); 
+ border: 1px solid var(--secondary); 
+ }
+
+ .risk-score {
+ font-size: 1.75rem;
+ font-weight: 700;
+ display: block;
+ margin-bottom: 0.25rem;
+ }
+
+ /* Quote */
  .quote {
  font-style: italic;
- font-size: 1.5rem;
- color: rgba(255,255,255,0.8);
+ font-size: clamp(1.1rem, 2vw, 1.4rem);
+ color: rgba(255,255,255,0.85);
  border-left: 4px solid var(--secondary);
- padding-left: 30px;
- margin: 30px 0;
+ padding-left: 1.5rem;
+ margin: 2rem 0;
+ position: relative;
  }
 
- @media (max-width: 1024px) {
- .two-column, .three-column {
- grid-template-columns: 1fr;
- }
- h1 { font-size: 2.5rem; }
- h2 { font-size: 2rem; }
- .slide { padding: 30px; }
- }
-
- .fade-in {
- animation: fadeIn 0.8s ease-in;
+ .quote::before {
+ content: '"';
+ font-size: 4rem;
+ color: var(--secondary);
+ opacity: 0.3;
+ position: absolute;
+ left: 0.5rem;
+ top: -1rem;
+ font-family: Georgia, serif;
  }
 
- @keyframes fadeIn {
- from { opacity: 0; transform: translateY(20px); }
- to { opacity: 1; transform: translateY(0); }
- }
-
+ /* Diagram boxes */
  .diagram-box {
  background: rgba(255,255,255,0.05);
  border: 2px solid var(--secondary);
  border-radius: 12px;
- padding: 20px;
- margin: 10px;
+ padding: 1.25rem;
  text-align: center;
- position: relative;
+ transition: all 0.3s;
+ }
+
+ .diagram-box:hover {
+ background: rgba(0,212,170,0.1);
+ transform: translateY(-3px);
  }
 
  .arrow-down {
  text-align: center;
  color: var(--secondary);
  font-size: 2rem;
- margin: 10px 0;
+ margin: 0.75rem 0;
+ animation: bounce 2s infinite;
  }
 
+ @keyframes bounce {
+ 0%, 100% { transform: translateY(0); }
+ 50% { transform: translateY(-5px); }
+ }
+
+ /* User story cards */
  .user-story-card {
- background: rgba(255,255,255,0.03);
+ background: rgba(255,255,255,0.04);
  border-radius: 12px;
- padding: 20px;
- margin: 10px 0;
+ padding: 1.25rem;
  border-left: 4px solid var(--accent);
+ transition: all 0.3s;
+ }
+
+ .user-story-card:hover {
+ transform: translateX(5px);
+ background: rgba(255,255,255,0.08);
  }
 
  .story-type {
- font-size: 0.75rem;
+ font-size: 0.7rem;
  text-transform: uppercase;
- letter-spacing: 1px;
+ letter-spacing: 1.5px;
  color: var(--accent);
- margin-bottom: 8px;
+ margin-bottom: 0.5rem;
+ font-weight: 600;
+ }
+
+ /* Animations */
+ .fade-in {
+ animation: fadeIn 0.8s ease-out forwards;
+ }
+
+ @keyframes fadeIn {
+ from { opacity: 0; transform: translateY(30px); }
+ to { opacity: 1; transform: translateY(0); }
+ }
+
+ .slide-up {
+ animation: slideUp 0.6s ease-out forwards;
+ }
+
+ @keyframes slideUp {
+ from { opacity: 0; transform: translateY(50px); }
+ to { opacity: 1; transform: translateY(0); }
+ }
+
+ /* Print styles */
+ @media print {
+ .nav-controls, .slide-counter, .progress-bar, .keyboard-hint {
+ display: none !important;
+ }
+ 
+ .slide {
+ position: static;
+ display: block !important;
+ opacity: 1 !important;
+ transform: none !important;
+ page-break-after: always;
+ height: auto;
+ min-height: 100vh;
+ }
+ 
+ body {
+ overflow: auto;
+ background: white;
+ color: black;
+ }
+ }
+
+ /* Mobile responsiveness */
+ @media (max-width: 768px) {
+ .two-column, .three-column, .four-column {
+ grid-template-columns: 1fr;
+ }
+ 
+ .timeline {
+ padding-left: 2rem;
+ }
+ 
+ .timeline-item::before {
+ left: -1.75rem;
+ width: 12px;
+ height: 12px;
+ }
+ 
+ .problem-grid {
+ grid-template-columns: 1fr;
+ }
+ 
+ .risk-matrix {
+ grid-template-columns: repeat(2, 1fr);
+ }
+ 
+ .compliance-container {
+ flex-direction: column;
+ align-items: center;
+ }
+ 
+ .compliance-badge {
+ width: 100%;
+ max-width: 300px;
+ justify-content: center;
+ }
+ }
+
+ /* High contrast mode support */
+ @media (prefers-contrast: high) {
+ .card, .problem-item, .solution-item, .timeline-item {
+ border-width: 2px;
+ }
+ }
+
+ /* Reduced motion support */
+ @media (prefers-reduced-motion: reduce) {
+ *, *::before, *::after {
+ animation-duration: 0.01ms !important;
+ animation-iteration-count: 1 !important;
+ transition-duration: 0.01ms !important;
+ }
+ }
+
+ /* Focus styles for accessibility */
+ button:focus-visible, input:focus-visible {
+ outline: 3px solid var(--secondary);
+ outline-offset: 2px;
+ }
+
+ /* Selection color */
+ ::selection {
+ background: var(--secondary);
+ color: var(--dark);
+ }
+
+ /* Scrollbar styling */
+ ::-webkit-scrollbar {
+ width: 8px;
+ height: 8px;
+ }
+
+ ::-webkit-scrollbar-track {
+ background: rgba(255,255,255,0.05);
+ }
+
+ ::-webkit-scrollbar-thumb {
+ background: var(--secondary);
+ border-radius: 4px;
+ }
+
+ ::-webkit-scrollbar-thumb:hover {
+ background: var(--secondary-dark);
  }
  </style>
 </head>
 <body>
  <div class="progress-bar" id="progressBar"></div>
+ <div class="keyboard-hint">Press ? for help</div>
 
  <div class="presentation">
  <!-- Slide 1: Title -->
@@ -457,122 +928,123 @@
  <div class="center-content">
  <div class="logo-placeholder">CEDR</div>
  <h1>Cybersecurity Event Data Recorder</h1>
- <h3 style="color: rgba(255,255,255,0.8); font-weight: 400;">In-Vehicle Forensic Readiness Module</h3>
- <div style="margin-top: 40px;">
- <span class="badge">ISO/SAE 21434 Compliant</span>
- <span class="badge">UN R155/R156 Ready</span>
- <span class="badge">ML-Powered</span>
+ <h3 style="color: rgba(255,255,255,0.8); font-weight: 400; margin-top: 1rem;">In-Vehicle Forensic Readiness Module</h3>
+ <div class="badge-container" style="margin-top: 2.5rem;">
+ <span class="badge">🛡️ ISO/SAE 21434 Compliant</span>
+ <span class="badge">⚡ UN R155/R156 Ready</span>
+ <span class="badge">🤖 ML-Powered</span>
  </div>
- <p style="margin-top: 40px; font-size: 1rem; color: rgba(255,255,255,0.6);">
- Team Cyber-Torque | CYB408 Capstone | St. Clair College
+ <p style="margin-top: 3rem; font-size: 1rem; color: rgba(255,255,255,0.6);">
+ <strong>Team Cyber-Torque</strong> | CYB408 Capstone | St. Clair College<br>
+ <span style="font-size: 0.85rem;">April 2026</span>
  </p>
  </div>
  </div>
 
  <!-- Slide 2: The Problem -->
  <div class="slide" id="slide2">
- <h2>The Critical Challenge</h2>
+ <h2>🎯 The Critical Challenge</h2>
+ <p style="margin-bottom: 1.5rem;">Modern connected vehicles face unprecedented cybersecurity risks with inadequate forensic capabilities.</p>
  <div class="problem-grid">
  <div class="problem-item">
- <h3 style="color: var(--danger); font-size: 1.3rem;">100+ ECUs</h3>
- <p>Modern vehicles contain 100+ ECUs generating terabytes of data with no standardized security event logging.</p>
+ <h3 style="color: var(--danger); font-size: 1.2rem;">100+ ECUs</h3>
+ <p style="font-size: 0.95rem;">Modern vehicles contain 100+ ECUs generating terabytes of data with no standardized security event logging.</p>
  </div>
  <div class="problem-item">
- <h3 style="color: var(--danger); font-size: 1.3rem;">287 Days</h3>
- <p>Average breach detection time in automotive systems, leaving attackers with extended dwell time.</p>
+ <h3 style="color: var(--danger); font-size: 1.2rem;">287 Days</h3>
+ <p style="font-size: 0.95rem;">Average breach detection time in automotive systems, leaving attackers with extended dwell time.</p>
  </div>
  <div class="problem-item">
- <h3 style="color: var(--danger); font-size: 1.3rem;">40% Denial</h3>
- <p>Insurance claim denial rate due to lack of tamper-evident forensic evidence after cyber incidents.</p>
+ <h3 style="color: var(--danger); font-size: 1.2rem;">40% Denial</h3>
+ <p style="font-size: 0.95rem;">Insurance claim denial rate due to lack of tamper-evident forensic evidence after cyber incidents.</p>
  </div>
  <div class="problem-item">
- <h3 style="color: var(--danger); font-size: 1.3rem;">€30M Fines</h3>
- <p>Regulatory fines under UN R155 for non-compliance with cybersecurity management systems.</p>
+ <h3 style="color: var(--danger); font-size: 1.2rem;">€30M Fines</h3>
+ <p style="font-size: 0.95rem;">Regulatory fines under UN R155 for non-compliance with cybersecurity management systems.</p>
  </div>
  </div>
- <div class="image-container" style="max-width: 600px; margin: 30px auto;">
- <img src="https://www.sharetechnote.com/image/5G_Vehicle_Network_Architecture_01.png" alt="Connected Vehicle Attack Surface" style="max-height: 250px; object-fit: cover;">
+ <div class="quote">
+ Without CEDR, OEMs have no tamper-evident record of cyber attacks, leading to denied claims, stalled investigations, and regulatory penalties.
  </div>
  </div>
 
  <!-- Slide 3: The Solution -->
  <div class="slide" id="slide3">
- <h2>CEDR Solution Overview</h2>
- <div class="two-column">
- <div>
- <div class="solution-item" style="margin-bottom: 20px;">
+ <h2>💡 CEDR Solution Overview</h2>
+ <div class="three-column" style="margin-bottom: 2rem;">
+ <div class="solution-item">
  <h3 style="color: var(--secondary);">⚡ Real-Time Detection</h3>
- <p>&lt;500ms latency for threat detection using ML-based anomaly detection</p>
- </div>
- <div class="solution-item" style="margin-bottom: 20px;">
- <h3 style="color: var(--secondary);">🔐 Tamper-Evident Logging</h3>
- <p>Cryptographic hash chaining ensures forensic integrity of all security events</p>
- </div>
- <div class="solution-item" style="margin-bottom: 20px;">
- <h3 style="color: var(--secondary);">🤖 ML-Based Detection</h3>
- <p>&lt;5% false positives using TensorFlow Lite inference on edge</p>
+ <p style="font-size: 0.95rem;">&lt;500ms latency for threat detection using ML-based anomaly detection</p>
  </div>
  <div class="solution-item">
- <h3 style="color: var(--secondary);">📊 Full Compliance</h3>
- <p>ISO 21434 + UN R155/R156 compliant architecture</p>
+ <h3 style="color: var(--secondary);">🔐 Tamper-Evident</h3>
+ <p style="font-size: 0.95rem;">Cryptographic hash chaining ensures forensic integrity of all security events</p>
+ </div>
+ <div class="solution-item">
+ <h3 style="color: var(--secondary);">🤖 ML Detection</h3>
+ <p style="font-size: 0.95rem;">&lt;5% false positives using TensorFlow Lite inference on edge</p>
  </div>
  </div>
- <div class="center-content">
+ <div class="three-column">
  <div class="stat-card card">
  <span class="stat-number">$485</span>
  <span class="stat-label">Per Vehicle Cost</span>
+ <span class="stat-sublabel">vs $800-1,200 market avg</span>
  </div>
- <div class="stat-card card" style="margin-top: 20px;">
+ <div class="stat-card card">
  <span class="stat-number">82%</span>
- <span class="stat-label">Cost Advantage vs Competitors</span>
+ <span class="stat-label">Cost Advantage</span>
+ <span class="stat-sublabel">vs ESCRYPT/Harman</span>
  </div>
- <p style="margin-top: 20px; font-size: 0.9rem; color: rgba(255,255,255,0.6);">
- vs. $800-1,200/vehicle market average
- </p>
+ <div class="stat-card card">
+ <span class="stat-number">&lt;500ms</span>
+ <span class="stat-label">Detection Latency</span>
+ <span class="stat-sublabel">Real-time response</span>
  </div>
  </div>
  </div>
 
  <!-- Slide 4: System Architecture -->
  <div class="slide" id="slide4">
- <h2>System Architecture</h2>
+ <h2>🏗️ System Architecture</h2>
  <div class="architecture-container">
- <div style="text-align: center; margin-bottom: 30px;">
- <h3 style="color: var(--secondary); margin-bottom: 20px;">Vehicle Edge Layer</h3>
+ <div style="text-align: center; margin-bottom: 2rem;">
+ <h3 style="color: var(--secondary);">Vehicle Edge Layer</h3>
  </div>
  <div class="three-column">
  <div class="diagram-box">
  <strong>CAN Bus Interface</strong>
- <p style="font-size: 0.9rem; margin-top: 10px;">Real-time vehicle network monitoring</p>
+ <p style="font-size: 0.85rem; margin-top: 0.5rem; opacity: 0.8;">Real-time vehicle network monitoring</p>
  </div>
  <div class="diagram-box">
  <strong>GPS/GNSS Receiver</strong>
- <p style="font-size: 0.9rem; margin-top: 10px;">Location & timestamp correlation</p>
+ <p style="font-size: 0.85rem; margin-top: 0.5rem; opacity: 0.8;">Location & timestamp correlation</p>
  </div>
  <div class="diagram-box">
  <strong>4G/LTE Cellular</strong>
- <p style="font-size: 0.9rem; margin-top: 10px;">Secure cloud connectivity</p>
+ <p style="font-size: 0.85rem; margin-top: 0.5rem; opacity: 0.8;">Secure cloud connectivity</p>
  </div>
  </div>
  <div class="arrow-down">↓</div>
- <div style="background: rgba(99,91,255,0.1); border: 2px solid var(--accent); border-radius: 16px; padding: 30px; margin: 20px 0;">
- <h3 style="text-align: center; color: var(--accent); margin-bottom: 20px;">CEDR Core Processing Module (Raspberry Pi CM4 Industrial)</h3>
+ <div style="background: linear-gradient(135deg, rgba(99,91,255,0.15) 0%, rgba(99,91,255,0.05) 100%); border: 2px solid var(--accent); border-radius: 16px; padding: 2rem; margin: 1rem 0;">
+ <h3 style="text-align: center; color: var(--accent); margin-bottom: 1.5rem;">CEDR Core Processing Module</h3>
+ <p style="text-align: center; font-size: 0.9rem; color: rgba(255,255,255,0.7); margin-bottom: 1rem;">Raspberry Pi CM4 Industrial (8GB RAM, 32GB eMMC)</p>
  <div class="tech-stack" style="justify-content: center;">
- <span class="tech-item">Event Detection Engine</span>
- <span class="tech-item">TensorFlow Lite ML</span>
- <span class="tech-item">Hash Chain Verification</span>
- <span class="tech-item">AES-256-GCM Encryption</span>
+ <span class="tech-item">⚡ Event Detection</span>
+ <span class="tech-item">🧠 TensorFlow Lite</span>
+ <span class="tech-item">🔗 Hash Chain</span>
+ <span class="tech-item">🔒 AES-256-GCM</span>
  </div>
  </div>
  <div class="arrow-down">↓</div>
- <div class="two-column" style="gap: 20px;">
+ <div class="two-column" style="gap: 1rem;">
  <div class="diagram-box" style="border-color: var(--secondary);">
- <strong>NXP A71CH HSM</strong>
- <p style="font-size: 0.9rem; margin-top: 10px;">Secure key storage & crypto acceleration</p>
+ <strong>🔐 NXP A71CH HSM</strong>
+ <p style="font-size: 0.85rem; margin-top: 0.5rem; opacity: 0.8;">Secure key storage & crypto acceleration</p>
  </div>
  <div class="diagram-box" style="border-color: var(--warning);">
- <strong>Tamper Detection</strong>
- <p style="font-size: 0.9rem; margin-top: 10px;">Enclosure breach & temperature sensors</p>
+ <strong>⚠️ Tamper Detection</strong>
+ <p style="font-size: 0.85rem; margin-top: 0.5rem; opacity: 0.8;">Enclosure breach & temperature sensors</p>
  </div>
  </div>
  </div>
@@ -580,132 +1052,141 @@
 
  <!-- Slide 5: Cloud Infrastructure -->
  <div class="slide" id="slide5">
- <h2>Cloud Infrastructure</h2>
+ <h2>☁️ Cloud Infrastructure</h2>
  <div class="architecture-container">
- <div style="text-align: center; margin-bottom: 30px;">
- <span style="color: var(--secondary); font-size: 1.2rem;">Encrypted TLS 1.3 Connection</span>
+ <div style="text-align: center; margin-bottom: 2rem;">
+ <span style="color: var(--secondary); font-size: 1.1rem;">🔗 Encrypted TLS 1.3 Connection</span>
  </div>
- <div class="three-column" style="margin-bottom: 30px;">
+ <div class="three-column" style="margin-bottom: 2rem;">
  <div class="card" style="text-align: center; border-color: #ff9900;">
- <h3 style="color: #ff9900;">AWS</h3>
- <p>Primary Cloud</p>
+ <h3 style="color: #ff9900; font-size: 1.5rem;">AWS</h3>
+ <p style="font-size: 0.9rem;">Primary Cloud Platform</p>
+ <div class="tech-stack" style="justify-content: center; margin-top: 1rem;">
+ <span class="tech-item" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;">EC2</span>
+ <span class="tech-item" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;">S3</span>
+ <span class="tech-item" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;">RDS</span>
+ </div>
  </div>
  <div class="card" style="text-align: center; border-color: #0078d4;">
- <h3 style="color: #0078d4;">Azure</h3>
- <p>Backup/DR</p>
+ <h3 style="color: #0078d4; font-size: 1.5rem;">Azure</h3>
+ <p style="font-size: 0.9rem;">Backup & Disaster Recovery</p>
+ <div class="tech-stack" style="justify-content: center; margin-top: 1rem;">
+ <span class="tech-item" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;">VMs</span>
+ <span class="tech-item" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;">Blob</span>
+ <span class="tech-item" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;">SQL</span>
+ </div>
  </div>
  <div class="card" style="text-align: center; border-color: #4285f4;">
- <h3 style="color: #4285f4;">GCP</h3>
- <p>ML Training</p>
- </div>
- </div>
- <div style="background: rgba(0,0,0,0.3); border-radius: 16px; padding: 30px; border: 1px solid rgba(255,255,255,0.2);">
- <h3 style="text-align: center; margin-bottom: 20px; color: var(--secondary);">Kubernetes Cluster</h3>
- <div class="three-column">
- <div class="tech-item" style="text-align: center; flex: 1;">API Gateway</div>
- <div class="tech-item" style="text-align: center; flex: 1;">Event Processor</div>
- <div class="tech-item" style="text-align: center; flex: 1;">ML Inference</div>
+ <h3 style="color: #4285f4; font-size: 1.5rem;">GCP</h3>
+ <p style="font-size: 0.9rem;">ML Training & Inference</p>
+ <div class="tech-stack" style="justify-content: center; margin-top: 1rem;">
+ <span class="tech-item" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;">Vertex AI</span>
+ <span class="tech-item" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;">Cloud Storage</span>
  </div>
  </div>
  </div>
- <div class="image-container" style="max-width: 500px; margin: 20px auto;">
- <img src="https://blogs.sw.siemens.com/wp-content/uploads/sites/2/2020/04/Automotive-Security-Siemens-PLM-1.png" alt="Secure Automotive Architecture" style="max-height: 200px; object-fit: cover;">
+ <div style="background: linear-gradient(135deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 100%); border-radius: 16px; padding: 2rem; border: 1px solid rgba(255,255,255,0.15);">
+ <h3 style="text-align: center; margin-bottom: 1.5rem; color: var(--secondary);">☸️ Kubernetes Cluster</h3>
+ <div class="four-column">
+ <div class="tech-item" style="text-align: center; justify-content: center;">🌐 API Gateway</div>
+ <div class="tech-item" style="text-align: center; justify-content: center;">⚙️ Event Processor</div>
+ <div class="tech-item" style="text-align: center; justify-content: center;">🧠 ML Inference</div>
+ <div class="tech-item" style="text-align: center; justify-content: center;">💾 Time-Series DB</div>
+ </div>
+ </div>
  </div>
  </div>
 
  <!-- Slide 6: Security Features -->
  <div class="slide" id="slide6">
- <h2>Security Architecture</h2>
+ <h2>🔒 Security Architecture</h2>
  <div class="two-column">
  <div>
- <h3>Cryptographic Protections</h3>
+ <h3 style="color: var(--secondary); margin-bottom: 1rem;">🛡️ Cryptographic Protections</h3>
  <ul class="feature-list">
- <li>AES-256-GCM encryption for data at rest</li>
- <li>SHA-256 hash chaining for tamper evidence</li>
- <li>TLS 1.3 for data in transit</li>
- <li>NXP A71CH Secure Element for key storage</li>
- <li>Hardware-backed crypto acceleration</li>
+ <li><strong>AES-256-GCM:</strong> Hardware-accelerated encryption for data at rest</li>
+ <li><strong>SHA-256 Hash Chain:</strong> Blockchain-style tamper-evident logging</li>
+ <li><strong>TLS 1.3:</strong> Latest transport security for data in transit</li>
+ <li><strong>NXP A71CH HSM:</strong> FIPS 140-2 Level 2 secure key storage</li>
+ <li><strong>Certificate Pinning:</strong> Prevents MITM attacks on vehicle-cloud link</li>
  </ul>
- <div class="image-container" style="margin-top: 20px;">
- <img src="https://media2.dev.to/dynamic/image/width=1000,height=420,fit=cover,gravity=auto,format=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2F9n1jr83wp0z67wlrmbes.jpg" alt="Tamper Detection System" style="max-height: 180px; object-fit: cover;">
- </div>
  </div>
  <div>
- <h3>Physical Security</h3>
+ <h3 style="color: var(--warning); margin-bottom: 1rem;">⚠️ Physical Security</h3>
  <ul class="feature-list">
- <li>Enclosure breach detection</li>
- <li>Temperature monitoring</li>
- <li>Anti-tamper mesh circuits</li>
- <li>Secure boot with signed firmware</li>
- <li>Real-time integrity monitoring</li>
+ <li><strong>Enclosure Breach:</strong> Immediate detection of unauthorized access</li>
+ <li><strong>Temperature Monitoring:</strong> Detects environmental tampering</li>
+ <li><strong>Anti-Tamper Mesh:</strong> Circuit triggers zeroization on breach</li>
+ <li><strong>Secure Boot:</strong> Verified boot chain with signed firmware</li>
+ <li><strong>Zero-Trust:</strong> Continuous verification architecture</li>
  </ul>
- <div class="image-container" style="margin-top: 20px;">
- <img src="https://www.cnx-software.com/wp-content/uploads/2019/11/NXP-A71CH-Secure-Element.png" alt="NXP A71CH Secure Element" style="max-height: 180px; object-fit: cover;">
  </div>
  </div>
+ <div class="quote" style="margin-top: 2rem;">
+ CEDR provides court-admissible forensic evidence with cryptographic proof of integrity—essential for insurance claims and regulatory compliance.
  </div>
  </div>
 
  <!-- Slide 7: Agile User Stories -->
  <div class="slide" id="slide7">
- <h2>Agile User Stories</h2>
- <p style="margin-bottom: 30px;">28 comprehensive user stories covering functional, security, and abuse cases aligned with OWASP patterns.</p>
+ <h2>📋 Agile User Stories</h2>
+ <p style="margin-bottom: 1.5rem;">28 comprehensive user stories aligned with OWASP patterns covering functional, security, and abuse cases.</p>
  <div class="three-column">
  <div class="user-story-card">
- <div class="story-type">Functional Story</div>
- <p><strong>As a</strong> vehicle owner<br>
+ <div class="story-type" style="color: var(--secondary);">✨ Functional Story</div>
+ <p style="font-size: 0.95rem;"><strong>As a</strong> vehicle owner<br>
  <strong>I want</strong> security events logged in real-time<br>
  <strong>So that</strong> I have forensic evidence after incidents</p>
  </div>
  <div class="user-story-card" style="border-left-color: var(--danger);">
- <div class="story-type" style="color: var(--danger);">Abuse Case</div>
- <p><strong>As an</strong> attacker<br>
+ <div class="story-type" style="color: var(--danger);">⚠️ Abuse Case</div>
+ <p style="font-size: 0.95rem;"><strong>As an</strong> attacker<br>
  <strong>I want to</strong> delete security logs<br>
  <strong>So that</strong> my activities remain undetected</p>
  </div>
- <div class="user-story-card" style="border-left-color: var(--secondary);">
- <div class="story-type" style="color: var(--secondary);">Countermeasure</div>
- <p><strong>As a</strong> security engineer<br>
+ <div class="user-story-card" style="border-left-color: var(--info);">
+ <div class="story-type" style="color: var(--info);">🛡️ Countermeasure</div>
+ <p style="font-size: 0.95rem;"><strong>As a</strong> security engineer<br>
  <strong>I want</strong> hash-chained immutable logs<br>
  <strong>So that</strong> tampering is immediately evident</p>
  </div>
  </div>
- <div style="margin-top: 30px; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 12px;">
- <h3>Traceability Matrix</h3>
- <p>Each user story maps to: Requirements → Threats → Testing (Pen Tests, Unit Tests, Fuzzing) → System Components (ECUs, Telematics, Cloud)</p>
+ <div class="card" style="margin-top: 1.5rem;">
+ <h3 style="margin-bottom: 0.75rem;">🔗 Traceability Matrix</h3>
+ <p style="font-size: 0.95rem;">Each user story maps through: <strong>Requirements</strong> → <strong>Threats (STRIDE)</strong> → <strong>Testing (Unit/Pen/Fuzz)</strong> → <strong>Components (ECU/Cloud)</strong> → <strong>ISO 21434 Work Products</strong></p>
  </div>
  </div>
 
  <!-- Slide 8: Use Cases -->
  <div class="slide" id="slide8">
- <h2>Automotive Use Cases</h2>
+ <h2>🚗 Automotive Use Cases</h2>
  <div class="two-column">
  <div>
- <div class="card" style="margin-bottom: 20px;">
+ <div class="card" style="margin-bottom: 1rem;">
  <h3 style="color: var(--secondary);">🔐 Secure Vehicle Access</h3>
- <p>Biometric authentication with forensic logging of all access attempts, successful and failed.</p>
+ <p style="font-size: 0.95rem;">Biometric authentication with forensic logging of all access attempts, successful and failed.</p>
  </div>
- <div class="card" style="margin-bottom: 20px;">
- <h3 style="color: var(--secondary);">📡 OTA Update Authentication</h3>
- <p>Cryptographic verification of firmware updates with rollback protection and audit trails.</p>
+ <div class="card" style="margin-bottom: 1rem;">
+ <h3 style="color: var(--secondary);">📡 OTA Update Auth</h3>
+ <p style="font-size: 0.95rem;">Cryptographic verification of firmware updates with rollback protection and audit trails.</p>
  </div>
  <div class="card">
  <h3 style="color: var(--secondary);">🚨 IDS Alert Management</h3>
- <p>Real-time intrusion detection with automated response and evidence preservation.</p>
+ <p style="font-size: 0.95rem;">Real-time intrusion detection with automated SOC response and evidence preservation.</p>
  </div>
  </div>
  <div>
- <div class="card" style="margin-bottom: 20px;">
+ <div class="card" style="margin-bottom: 1rem;">
  <h3 style="color: var(--secondary);">☁️ Secure ECU-to-Cloud</h3>
- <p>End-to-end encrypted telemetry with mutual authentication and session management.</p>
+ <p style="font-size: 0.95rem;">End-to-end encrypted telemetry with mutual TLS authentication and session management.</p>
  </div>
- <div class="card" style="margin-bottom: 20px;">
- <h3 style="color: var(--secondary);">👤 Driver Identity Verification</h3>
- <p>Continuous authentication with behavioral biometrics and personalization.</p>
+ <div class="card" style="margin-bottom: 1rem;">
+ <h3 style="color: var(--secondary);">👤 Driver Verification</h3>
+ <p style="font-size: 0.95rem;">Continuous authentication with behavioral biometrics and personalization logging.</p>
  </div>
  <div class="card" style="border-color: var(--danger);">
- <h3 style="color: var(--danger);">⚠️ Misuse Case: Firmware Flashing</h3>
- <p>Attacker attempts unauthorized firmware modification - detected and logged.</p>
+ <h3 style="color: var(--danger);">⚠️ Misuse: Firmware Attack</h3>
+ <p style="font-size: 0.95rem;">Attacker attempts unauthorized firmware modification—detected, blocked, and forensically logged.</p>
  </div>
  </div>
  </div>
@@ -713,88 +1194,97 @@
 
  <!-- Slide 9: UML Diagrams -->
  <div class="slide" id="slide9">
- <h2>UML Diagram Suite</h2>
+ <h2>📊 UML Diagram Suite</h2>
  <div class="three-column">
  <div class="card">
- <h3 style="color: var(--accent);">Use Case Diagrams</h3>
- <p><strong>Actors:</strong> Driver, Mechanic, Cloud Service, Attacker</p>
- <p><strong>Use Cases:</strong> Authenticate Driver, Secure OTA Update, Detect Anomalies</p>
+ <span class="card-icon">👥</span>
+ <h3>Use Case Diagrams</h3>
+ <p style="font-size: 0.9rem;"><strong>Actors:</strong> Driver, Mechanic, Cloud Service, Attacker</p>
+ <p style="font-size: 0.9rem;"><strong>Use Cases:</strong> Authenticate, OTA Update, Detect Anomalies</p>
  </div>
  <div class="card">
- <h3 style="color: var(--accent);">Sequence Diagrams</h3>
- <p>Message flows: Vehicle → Cloud, ECU → IDS → Alert Service</p>
- <p>Security controls: Encryption, Signatures, Mutual Auth</p>
+ <span class="card-icon">↔️</span>
+ <h3>Sequence Diagrams</h3>
+ <p style="font-size: 0.9rem;">Message flows: Vehicle→Cloud, ECU→IDS→Alert Service</p>
+ <p style="font-size: 0.9rem;">Security controls: Encryption, Signatures, Mutual Auth</p>
  </div>
  <div class="card">
- <h3 style="color: var(--accent);">Component Diagrams</h3>
- <p>In-vehicle networks (CAN, Automotive Ethernet), ECU layout, HSMs, Cloud integration</p>
+ <span class="card-icon">🧩</span>
+ <h3>Component Diagrams</h3>
+ <p style="font-size: 0.9rem;">CAN, Automotive Ethernet, ECU layout, HSMs, Cloud integration</p>
  </div>
  </div>
- <div class="three-column" style="margin-top: 20px;">
+ <div class="three-column" style="margin-top: 1rem;">
  <div class="card">
- <h3 style="color: var(--accent);">Deployment Diagrams</h3>
- <p>Physical architecture: Edge devices, cloud regions, security zones</p>
- </div>
- <div class="card">
- <h3 style="color: var(--accent);">Activity Diagrams</h3>
- <p>Incident detection → Logging → Alert escalation workflows</p>
+ <span class="card-icon">🖥️</span>
+ <h3>Deployment Diagrams</h3>
+ <p style="font-size: 0.9rem;">Physical architecture: Edge devices, cloud regions, security zones</p>
  </div>
  <div class="card">
- <h3 style="color: var(--accent);">Class Diagrams</h3>
- <p>Data models: SecurityEvent, HashChain, Evidence, Alert</p>
+ <span class="card-icon">🔄</span>
+ <h3>Activity Diagrams</h3>
+ <p style="font-size: 0.9rem;">Incident detection → Logging → Alert escalation workflows</p>
  </div>
+ <div class="card">
+ <span class="card-icon">📦</span>
+ <h3>Class Diagrams</h3>
+ <p style="font-size: 0.9rem;">Data models: SecurityEvent, HashChain, Evidence, Alert</p>
  </div>
- <div class="image-container" style="max-width: 400px; margin: 20px auto;">
- <img src="https://tuxera.com/wp-content/uploads/2020/11/4-Layer-Automotive-Security-Framework-2.png" alt="4-Layer Automotive Security Framework" style="max-height: 200px; object-fit: contain; background: white;">
  </div>
  </div>
 
  <!-- Slide 10: Risk Analysis -->
  <div class="slide" id="slide10">
- <h2>Risk Analysis & SWOT</h2>
+ <h2>⚡ Risk Analysis & SWOT</h2>
  <div class="two-column">
  <div>
- <h3>Risk Matrix (NIST Methodology)</h3>
+ <h3 style="margin-bottom: 1rem;">Risk Matrix (NIST Methodology)</h3>
  <div class="risk-matrix">
  <div class="risk-item risk-high">
+ <span class="risk-score" style="color: var(--danger);">HIGH</span>
  <strong>Supply Chain</strong>
- <p style="font-size: 0.9rem;">High</p>
+ <p style="font-size: 0.8rem; margin-top: 0.25rem;">SBOM validation</p>
  </div>
  <div class="risk-item risk-high">
+ <span class="risk-score" style="color: var(--danger);">HIGH</span>
  <strong>Crypto Agility</strong>
- <p style="font-size: 0.9rem;">High</p>
+ <p style="font-size: 0.8rem; margin-top: 0.25rem;">Post-quantum ready</p>
  </div>
  <div class="risk-item risk-med">
+ <span class="risk-score" style="color: var(--warning);">MED</span>
  <strong>Scalability</strong>
- <p style="font-size: 0.9rem;">Medium</p>
+ <p style="font-size: 0.8rem; margin-top: 0.25rem;">Auto-scaling K8s</p>
  </div>
  <div class="risk-item risk-med">
+ <span class="risk-score" style="color: var(--warning);">MED</span>
  <strong>Integration</strong>
- <p style="font-size: 0.9rem;">Medium</p>
+ <p style="font-size: 0.8rem; margin-top: 0.25rem;">Standard APIs</p>
  </div>
  <div class="risk-item risk-low">
+ <span class="risk-score" style="color: var(--secondary);">LOW</span>
  <strong>Performance</strong>
- <p style="font-size: 0.9rem;">Low</p>
+ <p style="font-size: 0.8rem; margin-top: 0.25rem;">&lt;500ms latency</p>
  </div>
  <div class="risk-item risk-low">
+ <span class="risk-score" style="color: var(--secondary);">LOW</span>
  <strong>Compliance</strong>
- <p style="font-size: 0.9rem;">Low</p>
+ <p style="font-size: 0.8rem; margin-top: 0.25rem;">ISO 21434 ready</p>
  </div>
  </div>
  </div>
  <div>
- <h3>SWOT Analysis</h3>
- <div class="card" style="margin-bottom: 15px; border-color: var(--secondary);">
- <strong style="color: var(--secondary);">Strengths:</strong> 82% cost advantage, ISO 21434 compliant, &lt;500ms latency
+ <h3 style="margin-bottom: 1rem;">SWOT Analysis</h3>
+ <div class="card" style="margin-bottom: 0.75rem; border-left: 4px solid var(--secondary);">
+ <strong style="color: var(--secondary);">💪 Strengths:</strong> 82% cost advantage, ISO 21434 compliant, &lt;500ms latency
  </div>
- <div class="card" style="margin-bottom: 15px; border-color: var(--warning);">
- <strong style="color: var(--warning);">Weaknesses:</strong> Student project, limited testing fleet, prototype hardware
+ <div class="card" style="margin-bottom: 0.75rem; border-left: 4px solid var(--warning);">
+ <strong style="color: var(--warning);">⚠️ Weaknesses:</strong> Student project, limited testing fleet, prototype hardware
  </div>
- <div class="card" style="margin-bottom: 15px; border-color: var(--accent);">
- <strong style="color: var(--accent);">Opportunities:</strong> UN R155 mandate, insurance partnerships, OEM integration
+ <div class="card" style="margin-bottom: 0.75rem; border-left: 4px solid var(--accent);">
+ <strong style="color: var(--accent);">🚀 Opportunities:</strong> UN R155 mandate, insurance partnerships, OEM integration
  </div>
- <div class="card" style="border-color: var(--danger);">
- <strong style="color: var(--danger);">Threats:</strong> Established competitors, certification costs, evolving threats
+ <div class="card" style="border-left: 4px solid var(--danger);">
+ <strong style="color: var(--danger);">⚡ Threats:</strong> Established competitors, certification costs, evolving threats
  </div>
  </div>
  </div>
@@ -802,19 +1292,27 @@
 
  <!-- Slide 11: Project Budget -->
  <div class="slide" id="slide11">
- <h2>Project Budget & TCO</h2>
- <div class="three-column" style="margin-bottom: 30px;">
+ <h2>💰 Project Budget & TCO</h2>
+ <div class="four-column" style="margin-bottom: 2rem;">
  <div class="stat-card card">
  <span class="stat-number">$1.37M</span>
- <span class="stat-label">Total Investment (24 months)</span>
+ <span class="stat-label">Total Investment</span>
+ <span class="stat-sublabel">24 months</span>
  </div>
  <div class="stat-card card">
  <span class="stat-number">$5.98M</span>
- <span class="stat-label">5-Year TCO (1,000 vehicles)</span>
+ <span class="stat-label">5-Year TCO</span>
+ <span class="stat-sublabel">1,000 vehicles</span>
  </div>
  <div class="stat-card card">
  <span class="stat-number">$485</span>
- <span class="stat-label">Per Vehicle at Scale</span>
+ <span class="stat-label">Per Vehicle</span>
+ <span class="stat-sublabel">At production scale</span>
+ </div>
+ <div class="stat-card card">
+ <span class="stat-number">2.2x</span>
+ <span class="stat-label">ROI</span>
+ <span class="stat-sublabel">Risk mitigation value</span>
  </div>
  </div>
  <table class="cost-table">
@@ -823,38 +1321,38 @@
  <th>Phase</th>
  <th>Investment</th>
  <th>Timeline</th>
- <th>Risk Reduction</th>
- <th>Deliverables</th>
+ <th>Risk ↓</th>
+ <th>Key Deliverables</th>
  </tr>
  </thead>
  <tbody>
  <tr>
  <td><strong>Phase 1: Foundation</strong></td>
- <td>$45,000</td>
+ <td class="highlight">$45,000</td>
  <td>Months 1-3</td>
  <td>40%</td>
- <td>Prototype, basic logging</td>
+ <td>Prototype, basic logging, cloud setup</td>
  </tr>
  <tr>
  <td><strong>Phase 2: Hardening</strong></td>
- <td>$120,000</td>
+ <td class="highlight">$120,000</td>
  <td>Months 4-6</td>
  <td>65%</td>
- <td>ML detection, encryption</td>
+ <td>ML detection, encryption, HSM integration</td>
  </tr>
  <tr>
  <td><strong>Phase 3: Production</strong></td>
- <td>$285,000</td>
+ <td class="highlight">$285,000</td>
  <td>Months 7-12</td>
  <td>80%</td>
- <td>AEC-Q100, compliance audit</td>
+ <td>AEC-Q100, compliance audit, 50-vehicle pilot</td>
  </tr>
- <tr>
+ <tr class="total-row">
  <td><strong>Phase 4: Scale</strong></td>
- <td>$850,000</td>
+ <td class="highlight">$850,000</td>
  <td>Months 13-24</td>
  <td>90%</td>
- <td>1,000 vehicle deployment</td>
+ <td>1,000 vehicle deployment, V2X integration</td>
  </tr>
  </tbody>
  </table>
@@ -862,83 +1360,75 @@
 
  <!-- Slide 12: BOM & Hardware -->
  <div class="slide" id="slide12">
- <h2>Hardware & BOM</h2>
+ <h2>🔧 Hardware & BOM</h2>
  <div class="two-column">
  <div>
- <h3>Prototype BOM</h3>
- <table class="cost-table">
+ <h3 style="color: var(--secondary); margin-bottom: 1rem;">🛠️ Prototype BOM</h3>
+ <table class="cost-table" style="font-size: 0.9rem;">
  <tr>
  <td>Raspberry Pi CM4 Industrial</td>
- <td class="highlight">$85</td>
+ <td class="highlight" style="text-align: right;">$85</td>
  </tr>
  <tr>
  <td>NXP A71CH Secure Element</td>
- <td class="highlight">$12</td>
+ <td class="highlight" style="text-align: right;">$12</td>
  </tr>
  <tr>
  <td>CAN Bus Interface Module</td>
- <td class="highlight">$25</td>
+ <td class="highlight" style="text-align: right;">$25</td>
  </tr>
  <tr>
  <td>4G/LTE Cellular Module</td>
- <td class="highlight">$45</td>
+ <td class="highlight" style="text-align: right;">$45</td>
  </tr>
  <tr>
  <td>GPS/GNSS Receiver</td>
- <td class="highlight">$18</td>
+ <td class="highlight" style="text-align: right;">$18</td>
  </tr>
  <tr>
  <td>Enclosure & Sensors</td>
- <td class="highlight">$35</td>
+ <td class="highlight" style="text-align: right;">$35</td>
  </tr>
- <tr style="background: rgba(0,212,170,0.1);">
+ <tr class="total-row">
  <td><strong>Total Unit Cost</strong></td>
- <td class="highlight"><strong>$220</strong></td>
+ <td class="highlight" style="text-align: right;"><strong>$220</strong></td>
  </tr>
  </table>
- <div class="image-container" style="margin-top: 20px;">
- <img src="https://www.embeddedpi.com/wp-content/uploads/2020/10/CM4-industrial-features-600x400.png" alt="Industrial Raspberry Pi CM4" style="max-height: 150px; object-fit: contain;">
- </div>
  </div>
  <div>
- <h3>Production BOM (1,000+ units)</h3>
- <table class="cost-table">
+ <h3 style="color: var(--secondary); margin-bottom: 1rem;">🏭 Production BOM (1K+)</h3>
+ <table class="cost-table" style="font-size: 0.9rem;">
  <tr>
- <td>Custom ARM Board</td>
- <td class="highlight">$65</td>
+ <td>Custom ARM Board (Volume)</td>
+ <td class="highlight" style="text-align: right;">$65</td>
  </tr>
  <tr>
  <td>Integrated HSM</td>
- <td class="highlight">$8</td>
+ <td class="highlight" style="text-align: right;">$8</td>
  </tr>
  <tr>
  <td>CAN/Ethernet PHY</td>
- <td class="highlight">$15</td>
+ <td class="highlight" style="text-align: right;">$15</td>
  </tr>
  <tr>
  <td>Cellular Module (Volume)</td>
- <td class="highlight">$32</td>
+ <td class="highlight" style="text-align: right;">$32</td>
  </tr>
  <tr>
  <td>Assembly & Testing</td>
- <td class="highlight">$25</td>
+ <td class="highlight" style="text-align: right;">$25</td>
  </tr>
  <tr>
  <td>Certification (Amortized)</td>
- <td class="highlight">$40</td>
+ <td class="highlight" style="text-align: right;">$40</td>
  </tr>
- <tr style="background: rgba(0,212,170,0.1);">
+ <tr class="total-row">
  <td><strong>Total Unit Cost</strong></td>
- <td class="highlight"><strong>$185</strong></td>
+ <td class="highlight" style="text-align: right;"><strong>$185</strong></td>
  </tr>
  </table>
- <div style="margin-top: 20px; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 12px;">
- <p><strong>Cost Reduction Strategies:</strong></p>
- <ul class="feature-list" style="margin-top: 10px;">
- <li>RAM optimization to avoid MCU upgrade</li>
- <li>Integrated PCB design reducing connectors</li>
- <li>Volume manufacturing partnerships</li>
- </ul>
+ <div class="card" style="margin-top: 1rem;">
+ <p style="font-size: 0.9rem;"><strong>💡 Cost Reduction:</strong> RAM optimization avoids MCU upgrade, integrated PCB reduces connectors, volume manufacturing cuts per-unit costs by 16%.</p>
  </div>
  </div>
  </div>
@@ -946,25 +1436,41 @@
 
  <!-- Slide 13: Compliance -->
  <div class="slide" id="slide13">
- <h2>Regulatory Compliance</h2>
- <div style="text-align: center; margin-bottom: 40px;">
- <span class="compliance-badge">
- <span class="check-icon">✓</span> ISO/SAE 21434 (7/7 Work Products)
- </span>
- <span class="compliance-badge">
- <span class="check-icon">✓</span> UN R155 CSMS
- </span>
- <span class="compliance-badge">
- <span class="check-icon">✓</span> UN R156 SUMS
- </span>
- <span class="compliance-badge">
- <span class="check-icon">✓</span> AEC-Q100 (Phase 3)
- </span>
- </div>
- <div class="two-column">
+ <h2>📜 Regulatory Compliance</h2>
+ <div class="compliance-container">
+ <div class="compliance-badge">
+ <span class="check-icon">✓</span>
  <div>
- <h3>ISO/SAE 21434 Coverage</h3>
- <ul class="feature-list">
+ <strong>ISO/SAE 21434</strong>
+ <p style="font-size: 0.8rem; margin: 0; opacity: 0.8;">7/7 Work Products Complete</p>
+ </div>
+ </div>
+ <div class="compliance-badge">
+ <span class="check-icon">✓</span>
+ <div>
+ <strong>UN R155 CSMS</strong>
+ <p style="font-size: 0.8rem; margin: 0; opacity: 0.8;">Cybersecurity Management</p>
+ </div>
+ </div>
+ <div class="compliance-badge">
+ <span class="check-icon">✓</span>
+ <div>
+ <strong>UN R156 SUMS</strong>
+ <p style="font-size: 0.8rem; margin: 0; opacity: 0.8;">Software Update Management</p>
+ </div>
+ </div>
+ <div class="compliance-badge">
+ <span class="check-icon">✓</span>
+ <div>
+ <strong>AEC-Q100</strong>
+ <p style="font-size: 0.8rem; margin: 0; opacity: 0.8;">Phase 3 Qualification</p>
+ </div>
+ </div>
+ </div>
+ <div class="two-column" style="margin-top: 1rem;">
+ <div class="card">
+ <h3 style="color: var(--secondary); margin-bottom: 1rem;">ISO/SAE 21434 Coverage</h3>
+ <ul class="feature-list" style="font-size: 0.95rem;">
  <li>Cybersecurity Management System (CSMS)</li>
  <li>Threat Analysis and Risk Assessment (TARA)</li>
  <li>Security Concept & Requirements</li>
@@ -974,9 +1480,9 @@
  <li>Continuous Monitoring & Response</li>
  </ul>
  </div>
- <div>
- <h3>UN R155/R156 Implementation</h3>
- <ul class="feature-list">
+ <div class="card">
+ <h3 style="color: var(--secondary); margin-bottom: 1rem;">UN R155/R156 Implementation</h3>
+ <ul class="feature-list" style="font-size: 0.95rem;">
  <li>Organizational cybersecurity governance</li>
  <li>Risk management system documentation</li>
  <li>Security by design throughout lifecycle</li>
@@ -987,121 +1493,123 @@
  </ul>
  </div>
  </div>
- <div class="quote">
- "CEDR provides the forensic evidence required to satisfy UN R155 incident response obligations and insurance claim validation."
+ <div class="quote" style="margin-top: 1.5rem;">
+ CEDR provides the forensic evidence required to satisfy UN R155 incident response obligations and enables successful insurance claim validation.
  </div>
  </div>
 
  <!-- Slide 14: DevSecOps & Tooling -->
  <div class="slide" id="slide14">
- <h2>DevSecOps & Tooling</h2>
+ <h2>🚀 DevSecOps & Tooling</h2>
  <div class="three-column">
  <div class="card">
- <h3 style="color: var(--accent);">CI/CD Pipeline</h3>
- <div class="tech-stack">
+ <span class="card-icon">🔄</span>
+ <h3>CI/CD Pipeline</h3>
+ <div class="tech-stack" style="margin-top: 1rem;">
  <span class="tech-item">GitHub Actions</span>
  <span class="tech-item">Docker</span>
  <span class="tech-item">Kubernetes</span>
  <span class="tech-item">Terraform</span>
  </div>
- <p style="font-size: 0.9rem;">Automated build, test, and deployment with security gates at each stage.</p>
+ <p style="font-size: 0.9rem; margin-top: 1rem;">Automated build, test, and deployment with security gates at each stage.</p>
  </div>
  <div class="card">
- <h3 style="color: var(--accent);">Security Testing</h3>
- <div class="tech-stack">
- <span class="tech-item">SAST (SonarQube)</span>
- <span class="tech-item">DAST (OWASP ZAP)</span>
- <span class="tech-item">SCA (Snyk)</span>
- <span class="tech-item">Fuzzing (AFL)</span>
+ <span class="card-icon">🔍</span>
+ <h3>Security Testing</h3>
+ <div class="tech-stack" style="margin-top: 1rem;">
+ <span class="tech-item">SAST</span>
+ <span class="tech-item">DAST</span>
+ <span class="tech-item">SCA</span>
+ <span class="tech-item">Fuzzing</span>
  </div>
- <p style="font-size: 0.9rem;">Continuous security testing with automated vulnerability scanning.</p>
+ <p style="font-size: 0.9rem; margin-top: 1rem;">Continuous security testing with automated vulnerability scanning.</p>
  </div>
  <div class="card">
- <h3 style="color: var(--accent);">Artifact Management</h3>
- <div class="tech-stack">
- <span class="tech-item">SBOM Generation</span>
- <span class="tech-item">Firmware Signing</span>
- <span class="tech-item">Secret Management</span>
- <span class="tech-item">License Scanning</span>
+ <span class="card-icon">📦</span>
+ <h3>Artifact Management</h3>
+ <div class="tech-stack" style="margin-top: 1rem;">
+ <span class="tech-item">SBOM</span>
+ <span class="tech-item">Signing</span>
+ <span class="tech-item">Secrets</span>
+ <span class="tech-item">License</span>
  </div>
- <p style="font-size: 0.9rem;">Complete supply chain security with signed artifacts and dependency tracking.</p>
+ <p style="font-size: 0.9rem; margin-top: 1rem;">Complete supply chain security with signed artifacts and dependency tracking.</p>
  </div>
  </div>
- <div style="margin-top: 30px; padding: 25px; background: rgba(255,255,255,0.05); border-radius: 16px; border: 1px solid var(--secondary);">
- <h3 style="color: var(--secondary); margin-bottom: 15px;">Security Champion Model</h3>
- <p>Cybersecurity stakeholders embedded in development teams with "shift-left" integration into sprint planning. In-sprint threat modeling identifies abuse cases before architecture hardens.</p>
+ <div class="card" style="margin-top: 1.5rem; border: 2px solid var(--secondary);">
+ <h3 style="color: var(--secondary); margin-bottom: 0.75rem;">🛡️ Security Champion Model</h3>
+ <p>Cybersecurity stakeholders embedded in development teams with <strong>"shift-left"</strong> integration into sprint planning. In-sprint threat modeling identifies abuse cases before architecture hardens, reducing remediation costs by 60%.</p>
  </div>
  </div>
 
  <!-- Slide 15: Cloud Cost Model -->
  <div class="slide" id="slide15">
- <h2>Cloud Infrastructure Costs</h2>
- <p style="margin-bottom: 20px;">AWS-based model for 1,000 vehicles with 1KB/sec telemetry ingestion.</p>
+ <h2>💵 Cloud Infrastructure Costs</h2>
+ <p style="margin-bottom: 1.5rem;">AWS-based model for 1,000 vehicles with 1KB/sec telemetry ingestion.</p>
  <div class="two-column">
  <div>
- <table class="cost-table">
+ <table class="cost-table" style="font-size: 0.9rem;">
  <thead>
  <tr>
- <th>Service</th>
- <th>Monthly Cost</th>
+ <th>AWS Service</th>
+ <th style="text-align: right;">Monthly</th>
  </tr>
  </thead>
  <tbody>
  <tr>
  <td>EC2 (Kubernetes nodes)</td>
- <td>$850</td>
+ <td class="highlight" style="text-align: right;">$850</td>
  </tr>
  <tr>
  <td>S3 Storage (30-day retention)</td>
- <td>$420</td>
+ <td class="highlight" style="text-align: right;">$420</td>
  </tr>
  <tr>
  <td>Data Transfer (Egress)</td>
- <td>$380</td>
+ <td class="highlight" style="text-align: right;">$380</td>
  </tr>
  <tr>
  <td>CloudWatch (Monitoring)</td>
- <td>$180</td>
+ <td class="highlight" style="text-align: right;">$180</td>
  </tr>
  <tr>
  <td>KMS (Key Management)</td>
- <td>$120</td>
+ <td class="highlight" style="text-align: right;">$120</td>
  </tr>
  <tr>
  <td>Secrets Manager</td>
- <td>$80</td>
+ <td class="highlight" style="text-align: right;">$80</td>
  </tr>
  <tr>
  <td>Support Plan (Business)</td>
- <td>$250</td>
+ <td class="highlight" style="text-align: right;">$250</td>
  </tr>
- <tr style="background: rgba(0,212,170,0.1);">
+ <tr class="total-row">
  <td><strong>Total Monthly</strong></td>
- <td class="highlight"><strong>$2,280</strong></td>
+ <td class="highlight" style="text-align: right;"><strong>$2,280</strong></td>
  </tr>
- <tr style="background: rgba(0,212,170,0.2);">
+ <tr class="total-row" style="background: rgba(0,212,170,0.15);">
  <td><strong>Annual Cost</strong></td>
- <td class="highlight"><strong>$27,360</strong></td>
+ <td class="highlight" style="text-align: right;"><strong>$27,360</strong></td>
  </tr>
  </tbody>
  </table>
  </div>
  <div>
- <div class="card" style="margin-bottom: 20px;">
- <h3>Assumptions</h3>
+ <div class="card" style="margin-bottom: 1rem;">
+ <h3 style="margin-bottom: 0.75rem;">📊 Assumptions</h3>
  <ul class="feature-list" style="font-size: 0.9rem;">
  <li>1 KB/second telemetry per vehicle</li>
  <li>30-day hot storage, 1-year cold archive</li>
  <li>Peak: 2x average load handling</li>
- <li>99.9% availability target</li>
- <li>Multi-AZ deployment</li>
+ <li>99.9% availability (Multi-AZ)</li>
  </ul>
  </div>
  <div class="card" style="border-color: var(--warning);">
- <h3 style="color: var(--warning);">Sensitivity Analysis</h3>
- <p style="font-size: 0.9rem;">+50% data egress: +$190/month<br>
- +20% scan minutes: +$85/month<br>
- +10% component price: +$85/month</p>
+ <h3 style="color: var(--warning); margin-bottom: 0.75rem;">⚠️ Sensitivity Analysis</h3>
+ <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">+50% data egress: <strong>+$190/month</strong></p>
+ <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">+20% scan minutes: <strong>+$85/month</strong></p>
+ <p style="font-size: 0.9rem;">+10% component price: <strong>+$85/month</strong></p>
  </div>
  </div>
  </div>
@@ -1109,50 +1617,78 @@
 
  <!-- Slide 16: Roadmap -->
  <div class="slide" id="slide16">
- <h2>Development Roadmap</h2>
+ <h2>🗺️ Development Roadmap</h2>
  <div class="timeline">
  <div class="timeline-item">
- <h3 style="color: var(--secondary);">Phase 1: Foundation (Months 1-3)</h3>
- <p>Hardware prototyping, basic CAN logging, cloud connectivity. <strong>$45,000 | 40% Risk Reduction</strong></p>
+ <div class="timeline-header">
+ <span class="timeline-title">📍 Phase 1: Foundation</span>
+ <span class="timeline-meta">
+ <span class="badge badge-success">$45,000</span>
+ <span style="color: rgba(255,255,255,0.6);">40% Risk ↓</span>
+ </span>
+ </div>
+ <p style="font-size: 0.95rem;">Hardware prototyping, basic CAN logging, cloud connectivity, initial ML model training</p>
  </div>
  <div class="timeline-item">
- <h3 style="color: var(--secondary);">Phase 2: Hardening (Months 4-6)</h3>
- <p>ML model integration, cryptographic protections, tamper detection. <strong>$120,000 | 65% Risk Reduction</strong></p>
+ <div class="timeline-header">
+ <span class="timeline-title">🔒 Phase 2: Hardening</span>
+ <span class="timeline-meta">
+ <span class="badge badge-success">$120,000</span>
+ <span style="color: rgba(255,255,255,0.6);">65% Risk ↓</span>
+ </span>
+ </div>
+ <p style="font-size: 0.95rem;">ML model integration, cryptographic protections, tamper detection, HSM integration</p>
  </div>
  <div class="timeline-item">
- <h3 style="color: var(--secondary);">Phase 3: Production (Months 7-12)</h3>
- <p>AEC-Q100 qualification, compliance audits, pilot fleet (50 vehicles). <strong>$285,000 | 80% Risk Reduction</strong></p>
+ <div class="timeline-header">
+ <span class="timeline-title">✅ Phase 3: Production</span>
+ <span class="timeline-meta">
+ <span class="badge badge-success">$285,000</span>
+ <span style="color: rgba(255,255,255,0.6);">80% Risk ↓</span>
+ </span>
+ </div>
+ <p style="font-size: 0.95rem;">AEC-Q100 qualification, compliance audits, pilot fleet (50 vehicles), SOC integration</p>
  </div>
  <div class="timeline-item">
- <h3 style="color: var(--secondary);">Phase 4: Scale (Months 13-24)</h3>
- <p>Mass production, 1,000 vehicle deployment, continuous monitoring. <strong>$850,000 | 90% Risk Reduction</strong></p>
+ <div class="timeline-header">
+ <span class="timeline-title">🚀 Phase 4: Scale</span>
+ <span class="timeline-meta">
+ <span class="badge badge-success">$850,000</span>
+ <span style="color: rgba(255,255,255,0.6);">90% Risk ↓</span>
+ </span>
+ </div>
+ <p style="font-size: 0.95rem;">Mass production, 1,000 vehicle deployment, V2X security, EU market entry</p>
  </div>
  </div>
  </div>
 
  <!-- Slide 17: Team -->
  <div class="slide" id="slide17">
- <h2>Team Cyber-Torque</h2>
+ <h2>👥 Team Cyber-Torque</h2>
  <div class="center-content">
- <div class="logo-placeholder" style="width: 150px; height: 150px; font-size: 3rem;">CT</div>
- <h3 style="margin-bottom: 30px;">St. Clair College | Windsor, ON</h3>
- <div class="three-column" style="max-width: 800px; margin-top: 30px;">
+ <div class="logo-placeholder" style="width: 140px; height: 140px; font-size: 2.5rem;">CT</div>
+ <h3 style="margin-bottom: 0.5rem;">St. Clair College</h3>
+ <p style="color: rgba(255,255,255,0.7); margin-bottom: 2rem;">Windsor, Ontario, Canada</p>
+ <div class="three-column" style="max-width: 800px; margin-top: 1rem;">
  <div class="card">
+ <span class="card-icon">🎓</span>
  <h3>Course</h3>
- <p>CYB408-26W-001<br>Automobility Cybersecurity CAP</p>
+ <p style="font-size: 0.9rem;">CYB408-26W-001<br>Automobility Cybersecurity CAP</p>
  </div>
  <div class="card">
+ <span class="card-icon">🏫</span>
  <h3>Institution</h3>
- <p>St. Clair College<br>Chatham, Ontario</p>
+ <p style="font-size: 0.9rem;">St. Clair College<br>Chatham, Ontario</p>
  </div>
  <div class="card">
- <h3>Project Type</h3>
- <p>Capstone Project<br>2024-2025</p>
+ <span class="card-icon">📅</span>
+ <h3>Project</h3>
+ <p style="font-size: 0.9rem;">Capstone Project<br>2024-2025</p>
  </div>
  </div>
- <p style="margin-top: 40px; font-size: 1rem; color: rgba(255,255,255,0.6);">
+ <p style="margin-top: 2.5rem; font-size: 1rem; color: rgba(255,255,255,0.6);">
  <strong>Advisors:</strong> Industry consultants and academic reviewers<br>
- <strong>Repository:</strong> github.com/sivasaiakunuru/cedr-ivfrm
+ <strong style="color: var(--secondary);">github.com/sivasaiakunuru/cedr-ivfrm</strong>
  </p>
  </div>
  </div>
@@ -1160,23 +1696,26 @@
  <!-- Slide 18: Q&A / Closing -->
  <div class="slide" id="slide18">
  <div class="center-content">
- <h1 style="font-size: 4rem;">Questions?</h1>
- <div style="margin: 40px 0;">
- <p style="font-size: 1.5rem; margin-bottom: 20px;">CEDR-IVFRM Project</p>
- <p style="font-size: 1.2rem; color: rgba(255,255,255,0.8);">Cybersecurity Event Data Recorder for Connected Vehicles</p>
+ <h1 style="font-size: clamp(3rem, 8vw, 5rem); margin-bottom: 1rem;">Questions?</h1>
+ <div style="margin: 2rem 0;">
+ <p style="font-size: clamp(1.2rem, 3vw, 1.5rem); margin-bottom: 0.5rem; color: rgba(255,255,255,0.9);">CEDR-IVFRM Project</p>
+ <p style="font-size: clamp(1rem, 2vw, 1.2rem); color: rgba(255,255,255,0.7);">Cybersecurity Event Data Recorder for Connected Vehicles</p>
  </div>
- <div style="margin-top: 40px;">
- <span class="badge">MIT Licensed</span>
- <span class="badge">Open Source</span>
- <span class="badge">Production Ready</span>
+ <div class="badge-container" style="margin: 2rem 0;">
+ <span class="badge">📜 MIT Licensed</span>
+ <span class="badge">🔓 Open Source</span>
+ <span class="badge">✅ Production Ready</span>
  </div>
- <div style="margin-top: 60px; padding: 30px; background: rgba(255,255,255,0.05); border-radius: 16px; max-width: 600px;">
- <p style="font-size: 1rem; color: rgba(255,255,255,0.7);">
+ <div class="card" style="margin-top: 2rem; max-width: 500px; width: 100%;">
+ <p style="font-size: 1rem; color: rgba(255,255,255,0.8); line-height: 1.8;">
  <strong>Contact:</strong> Team Cyber-Torque<br>
- <strong>Email:</strong> capstone@cybertorque.ca<br>
- <strong>GitHub:</strong> github.com/sivasaiakunuru/cedr-ivfrm
+ <strong>Email:</strong> <a href="mailto:capstone@cybertorque.ca" style="color: var(--secondary); text-decoration: none;">capstone@cybertorque.ca</a><br>
+ <strong>GitHub:</strong> <a href="https://github.com/sivasaiakunuru/cedr-ivfrm" style="color: var(--secondary); text-decoration: none;">github.com/sivasaiakunuru/cedr-ivfrm</a>
  </p>
  </div>
+ <p style="margin-top: 2rem; font-size: 0.85rem; color: rgba(255,255,255,0.5);">
+ Press <kbd style="background: rgba(255,255,255,0.1); padding: 0.2rem 0.5rem; border-radius: 4px;">?</kbd> for keyboard shortcuts
+ </p>
  </div>
  </div>
  </div>
@@ -1185,33 +1724,63 @@
  <span id="currentSlide">1</span> / <span id="totalSlides">18</span>
  </div>
 
+ <div class="slide-jumper" id="slideJumper">
+ <span style="font-size: 0.85rem; color: rgba(255,255,255,0.7);">Go to slide:</span>
+ <input type="number" id="jumpInput" min="1" max="18" placeholder="#">
+ <button class="nav-btn" style="width: 36px; height: 36px; font-size: 14px;" onclick="jumpToSlide()">Go</button>
+ </div>
+
  <div class="nav-controls">
- <button class="nav-btn" onclick="prevSlide()">←</button>
- <button class="nav-btn" onclick="nextSlide()">→</button>
+ <button class="nav-btn" onclick="prevSlide()" title="Previous (←)" aria-label="Previous slide">←</button>
+ <button class="nav-btn" onclick="toggleSlideJumper()" title="Go to slide (G)" aria-label="Jump to slide">#</button>
+ <button class="nav-btn" onclick="nextSlide()" title="Next (→ or Space)" aria-label="Next slide">→</button>
  </div>
 
  <script>
+ // Presentation state
  let currentSlide = 1;
  const totalSlides = 18;
-
- function showSlide(n) {
  const slides = document.querySelectorAll('.slide');
 
+ // Initialize
+ function init() {
+ document.getElementById('totalSlides').textContent = totalSlides;
+ showSlide(currentSlide);
+ updateProgressBar();
+ preloadImages();
+ }
+
+ // Show specific slide
+ function showSlide(n) {
+ // Handle bounds
  if (n > totalSlides) currentSlide = 1;
  if (n < 1) currentSlide = totalSlides;
 
- slides.forEach(slide => {
- slide.classList.remove('active');
+ // Update slides
+ slides.forEach((slide, index) => {
+ slide.classList.remove('active', 'prev');
+ if (index + 1 === currentSlide) {
+ slide.classList.add('active');
+ } else if (index + 1 < currentSlide) {
+ slide.classList.add('prev');
+ }
  });
 
- document.getElementById(`slide${currentSlide}`).classList.add('active');
+ // Update UI
  document.getElementById('currentSlide').textContent = currentSlide;
+ updateProgressBar();
+ 
+ // Reset scroll position
+ slides.forEach(slide => slide.scrollTop = 0);
+ }
 
  // Update progress bar
+ function updateProgressBar() {
  const progress = (currentSlide / totalSlides) * 100;
  document.getElementById('progressBar').style.width = `${progress}%`;
  }
 
+ // Navigation functions
  function nextSlide() {
  currentSlide++;
  showSlide(currentSlide);
@@ -1222,36 +1791,143 @@
  showSlide(currentSlide);
  }
 
- // Keyboard navigation
- document.addEventListener('keydown', (e) => {
- if (e.key === 'ArrowRight' || e.key === ' ') {
- nextSlide();
- } else if (e.key === 'ArrowLeft') {
- prevSlide();
+ function jumpToSlide() {
+ const input = document.getElementById('jumpInput');
+ const slideNum = parseInt(input.value);
+ if (slideNum >= 1 && slideNum <= totalSlides) {
+ currentSlide = slideNum;
+ showSlide(currentSlide);
+ toggleSlideJumper();
+ input.value = '';
+ }
+ }
+
+ function toggleSlideJumper() {
+ const jumper = document.getElementById('slideJumper');
+ jumper.classList.toggle('visible');
+ if (jumper.classList.contains('visible')) {
+ document.getElementById('jumpInput').focus();
+ }
+ }
+
+ // Preload images for smoother experience
+ function preloadImages() {
+ const images = document.querySelectorAll('.image-container img');
+ images.forEach(img => {
+ const src = img.getAttribute('src');
+ if (src) {
+ const preloadImg = new Image();
+ preloadImg.src = src;
  }
  });
+ }
 
- // Initialize
- document.getElementById('totalSlides').textContent = totalSlides;
+ // Keyboard navigation
+document.addEventListener('keydown', (e) => {
+ // Ignore if user is typing in an input
+ if (e.target.tagName === 'INPUT') {
+ if (e.key === 'Enter') {
+ jumpToSlide();
+ }
+ return;
+ }
+
+ switch(e.key) {
+ case 'ArrowRight':
+ case ' ':
+ case 'PageDown':
+ e.preventDefault();
+ nextSlide();
+ break;
+ case 'ArrowLeft':
+ case 'PageUp':
+ e.preventDefault();
+ prevSlide();
+ break;
+ case 'Home':
+ e.preventDefault();
+ currentSlide = 1;
  showSlide(currentSlide);
+ break;
+ case 'End':
+ e.preventDefault();
+ currentSlide = totalSlides;
+ showSlide(currentSlide);
+ break;
+ case 'g':
+ case 'G':
+ e.preventDefault();
+ toggleSlideJumper();
+ break;
+ case 'Escape':
+ document.getElementById('slideJumper').classList.remove('visible');
+ break;
+ case '?':
+ e.preventDefault();
+ alert(`Keyboard Shortcuts:
+← / → or Space - Navigate slides
+Home / End - First / Last slide
+G - Go to specific slide
+? - Show this help
+
+Touch: Swipe left/right to navigate`);
+ break;
+ }
+});
 
  // Touch support for mobile
  let touchStartX = 0;
  let touchEndX = 0;
+ let touchStartY = 0;
+ let touchEndY = 0;
 
  document.addEventListener('touchstart', e => {
  touchStartX = e.changedTouches[0].screenX;
- });
+ touchStartY = e.changedTouches[0].screenY;
+ }, {passive: true});
 
  document.addEventListener('touchend', e => {
  touchEndX = e.changedTouches[0].screenX;
+ touchEndY = e.changedTouches[0].screenY;
  handleSwipe();
- });
+ }, {passive: true});
 
  function handleSwipe() {
- if (touchEndX < touchStartX - 50) nextSlide();
- if (touchEndX > touchStartX + 50) prevSlide();
+ const diffX = touchStartX - touchEndX;
+ const diffY = touchStartY - touchEndY;
+ 
+ // Only handle horizontal swipes (ignore vertical scrolling)
+ if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+ if (diffX > 0) {
+ nextSlide(); // Swipe left = next
+ } else {
+ prevSlide(); // Swipe right = previous
  }
+ }
+ }
+
+ // Prevent spacebar from scrolling
+ window.addEventListener('keydown', (e) => {
+ if (e.key === ' ' && e.target.tagName !== 'INPUT') {
+ e.preventDefault();
+ }
+ });
+
+ // Initialize on load
+ document.addEventListener('DOMContentLoaded', init);
+
+ // Handle visibility change (pause when tab not visible)
+ document.addEventListener('visibilitychange', () => {
+ if (document.hidden) {
+ // Could add auto-pause for videos here
+ }
+ });
+
+ // Expose functions globally for onclick handlers
+ window.nextSlide = nextSlide;
+ window.prevSlide = prevSlide;
+ window.jumpToSlide = jumpToSlide;
+ window.toggleSlideJumper = toggleSlideJumper;
  </script>
 </body>
 </html>
