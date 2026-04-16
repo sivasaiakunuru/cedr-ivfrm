@@ -1,0 +1,139 @@
+version: '3.8'
+
+services:
+  # CEDR Cloud Backend
+  cedr-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: cedr-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=postgresql://cedr:${DB_PASSWORD}@postgres:5432/cedr
+      - REDIS_URL=redis://redis:6379/0
+      - CLOUD_ENDPOINT=${CLOUD_ENDPOINT:-http://localhost:8080}
+      - LOG_LEVEL=INFO
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - cedr-logs:/app/logs
+      - cedr-data:/app/data
+    networks:
+      - cedr-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8080/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: cedr-postgres
+    environment:
+      - POSTGRES_USER=cedr
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-cedr_secure_password}
+      - POSTGRES_DB=cedr
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5432:5432"
+    networks:
+      - cedr-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cedr"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: cedr-redis
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - cedr-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Grafana for monitoring
+  grafana:
+    image: grafana/grafana:latest
+    container_name: cedr-grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    networks:
+      - cedr-network
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+
+  # Prometheus for metrics
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: cedr-prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    volumes:
+      - prometheus-data:/prometheus
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    networks:
+      - cedr-network
+    restart: unless-stopped
+
+  # Development service (optional)
+  cedr-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: cedr-dev
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONPATH=/app
+    command: tail -f /dev/null
+    profiles:
+      - dev
+    networks:
+      - cedr-network
+
+volumes:
+  cedr-logs:
+  cedr-data:
+  postgres-data:
+  redis-data:
+  grafana-data:
+  prometheus-data:
+
+networks:
+  cedr-network:
+    driver: bridge
