@@ -1,0 +1,194 @@
+@startuml CEDR_Class_Diagram_v2
+skinparam backgroundColor #FEFEFE
+skinparam classAttributeIconSize 0
+
+title CEDR Class Diagram (Production Version)
+
+class Event {
+  +String eventId
+  +String vehicleId
+  +DateTime timestamp
+  +String eventType
+  +String severity
+  +String description
+  +String rawData
+  +String hash
+  +String previousHash
+  +Boolean uploaded
+  +Float anomalyScore
+  +Boolean isAnomalous
+  --
+  +encrypt()
+  +calculateHash()
+  +verifyIntegrity()
+  +classifyAnomaly()
+}
+
+class Vehicle {
+  +String vehicleId
+  +String vin
+  +String model
+  +DateTime registeredAt
+  +String status
+  +Float securityScore
+  +List~Float~ behaviorBaseline
+  --
+  +register()
+  +getEvents()
+  +getSecurityScore()
+  +updateBehaviorBaseline()
+}
+
+class Investigator {
+  +String investigatorId
+  +String name
+  +String badge
+  +String role
+  +List~String~ authorizedVehicles
+  +String mfaToken
+  --
+  +authenticate()
+  +authenticateMFA()
+  +searchEvents()
+  +exportEvidence()
+}
+
+class CloudServer {
+  +String serverId
+  +String endpoint
+  +String cloudProvider
+  --
+  +receiveEvent()
+  +verifyHMAC()
+  +verifySignature()
+  +storeEvent()
+  +correlateEvents()
+  +generateReport()
+  +trainMLModel()
+}
+
+class HashChain {
+  +String genesisHash
+  +List~String~ chain
+  +Integer chainLength
+  --
+  +addBlock()
+  +verifyChain()
+  +detectTampering()
+  +exportChain()
+}
+
+class EncryptionModule {
+  +String algorithm
+  +String keyId
+  +String hsmKeyHandle
+  --
+  +encrypt()
+  +decrypt()
+  +rotateKey()
+  +getKeyFromHSM()
+}
+
+class AlertService {
+  +sendAlert()
+  +escalate()
+  +notifyDashboard()
+  +sendSMS()
+  +sendEmail()
+  +createTicket()
+}
+
+class EvidencePackage {
+  +String packageId
+  +DateTime createdAt
+  +String digitalSignature
+  +String custodian
+  +String chainOfCustody
+  --
+  +generatePDF()
+  +generateJSON()
+  +verifySignature()
+  +addCustodyEntry()
+}
+
+class MLAnomalyDetector #LightGreen {
+  +String modelPath
+  +Float threshold
+  +String modelVersion
+  --
+  +loadModel()
+  +predict()
+  +updateBaseline()
+  +explainPrediction()
+  +exportModel()
+}
+
+class HSMManager #LightYellow {
+  +String hsmType
+  +String keyStorePath
+  +Boolean isTampered
+  --
+  +generateKey()
+  +signData()
+  +verifySignature()
+  +getPublicKey()
+  +checkTamper()
+  +zeroize()
+}
+
+class SecureBootVerifier #LightYellow {
+  +String bootloaderHash
+  +String kernelHash
+  +String rootFSHash
+  +Boolean verified
+  --
+  +verifyBootloader()
+  +verifyKernel()
+  +verifyRootFS()
+  +measureBoot()
+  +attestTPM()
+}
+
+class TemperatureMonitor #LightBlue {
+  +Float currentTemp
+  +Float minTemp
+  +Float maxTemp
+  +Boolean thermalThrottling
+  --
+  +readSensor()
+  +checkLimits()
+  +triggerThrottle()
+  +sendAlert()
+}
+
+class MultiCloudManager #LightGreen {
+  +List~String~ providers
+  +String primaryRegion
+  +String backupRegion
+  --
+  +routeTraffic()
+  +syncData()
+  +failover()
+  +getHealthStatus()
+}
+
+' Relationships
+Vehicle "1" --> "*" Event : generates >
+Investigator "1" --> "*" Event : retrieves >
+Investigator "1" --> "*" EvidencePackage : creates >
+Event "*" --> "1" HashChain : part of >
+Event ..> EncryptionModule : uses >
+CloudServer "1" --> "*" Event : stores >
+CloudServer ..> AlertService : triggers >
+EvidencePackage "1" --> "*" Event : contains >
+
+' New relationships
+Event ..> MLAnomalyDetector : classified by >
+MLAnomalyDetector --> Vehicle : updates baseline >
+EncryptionModule ..> HSMManager : uses >
+SecureBootVerifier --> Vehicle : verifies integrity >
+TemperatureMonitor --> Vehicle : monitors >
+CloudServer ..> MultiCloudManager : deployed on >
+MultiCloudManager --> CloudServer : manages >
+
+@enduml

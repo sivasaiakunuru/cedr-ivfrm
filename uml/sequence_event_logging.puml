@@ -1,0 +1,49 @@
+@startuml CEDR_Sequence_Event_Logging
+skinparam backgroundColor #FEFEFE
+skinparam sequenceMessageAlign center
+
+title Security Event Detection & Logging
+
+participant "CAN Bus" as CAN
+participant "IV-FRM\nModule" as IV
+participant "Local\nDatabase" as DB
+participant "Cloud\nBackend" as Cloud
+participant "Investigator\nDashboard" as Dash
+
+CAN -> IV: Suspicious Message Detected
+activate IV #LightBlue
+
+IV -> IV: Validate Message Format
+IV -> IV: Calculate SHA-256 Hash
+IV -> IV: AES-256 Encrypt Event Data
+
+IV -> DB: Store Event (SQLite)
+activate DB #LightGreen
+deactivate DB
+
+deactivate IV
+
+alt Critical Event (Severity = CRITICAL/HIGH)
+    IV -> Cloud: Immediate HTTPS Upload
+    activate Cloud #Gold
+    
+    Cloud -> Cloud: Verify HMAC-SHA256
+    Cloud -> Cloud: Decrypt & Validate
+    Cloud -> Cloud: Store with Chain Hash
+    
+    Cloud --> IV: 200 OK Acknowledge
+    
+    Cloud -> Dash: WebSocket Alert
+    activate Dash #Pink
+    deactivate Dash
+    
+    deactivate Cloud
+else Routine Event
+    IV -> IV: Add to Batch Queue
+end
+
+Dash -> Cloud: HTTPS Request Evidence
+activate Cloud #Gold
+Cloud --> Dash: Return Events + Hash Chain
+
+@enduml

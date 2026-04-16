@@ -1,0 +1,60 @@
+@startuml CEDR_Use_Case_Diagram
+left to right direction
+skinparam packageStyle rectangle
+skinparam backgroundColor #FEFEFE
+
+title CEDR Use Case Diagram
+
+actor "Driver" as Driver
+actor "Mechanic" as Mechanic
+actor "Forensic\nInvestigator" as Investigator
+actor "Cloud\nService" as Cloud
+actor "Attacker" as Attacker #Red
+
+rectangle "CEDR System" {
+    usecase "Authenticate\nDriver" as UC1
+    usecase "Monitor\nCAN Bus" as UC2
+    usecase "Detect\nAnomalies" as UC3
+    usecase "Log Security\nEvents" as UC4
+    usecase "Upload to\nCloud" as UC5
+    usecase "Generate\nAlerts" as UC6
+    usecase "Retrieve\nEvidence" as UC7
+    usecase "Verify\nIntegrity" as UC8
+    usecase "Generate\nReports" as UC9
+    usecase "Secure OTA\nUpdate" as UC10
+    
+    usecase "Inject Malicious\nMessages" as UC11 #Pink
+    usecase "Modify\nEvent Logs" as UC12 #Pink
+    usecase "Intercept\nCommunications" as UC13 #Pink
+}
+
+Driver --> UC1
+Driver --> UC10
+Mechanic --> UC7
+Investigator --> UC7
+Investigator --> UC8
+Investigator --> UC9
+Cloud --> UC5
+
+Attacker --> UC11
+Attacker --> UC12
+Attacker --> UC13
+
+UC2 ..> UC3 : <<include>>
+UC3 ..> UC4 : <<include>>
+UC4 ..> UC5 : <<include>>
+UC3 ..> UC6 : <<include>>
+
+note right of UC11
+  **Abuse Cases**
+  Attempted attacks that
+  CEDR detects & logs
+end note
+
+note bottom of UC3
+  **Core Security Function**
+  Real-time detection of
+  cyber threats
+end note
+
+@enduml

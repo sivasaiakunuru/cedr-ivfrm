@@ -1,0 +1,84 @@
+@startuml CEDR_Deployment_Diagram
+skinparam backgroundColor #FEFEFE
+
+title CEDR Deployment Architecture
+
+node "Vehicle Environment" as Vehicle #LightBlue {
+    
+    node "In-Vehicle Network" {
+        [CAN Bus] as CAN
+        [Automotive\nEthernet] as ETH
+    }
+    
+    node "CEDR Hardware" #LightBlue {
+        [Raspberry Pi 4] as RPi
+        [CAN HAT] as CANH
+        [4G/5G Modem] as Modem
+        [GPS Module] as GPS
+    }
+    
+    node "Software Stack" #LightBlue {
+        [Raspberry Pi OS] as OS
+        [Python Runtime] as Python
+        [(SQLite DB)] as SQLite
+        [CEDR Application] as App
+    }
+}
+
+node "AWS Cloud" as Cloud #LightGreen {
+    
+    node "Security Tier" #LightYellow {
+        [AWS WAF] as WAF
+        [AWS KMS] as KMS
+        [GuardDuty] as GuardDuty
+    }
+    
+    node "Application Tier" #LightGreen {
+        [API Server 1] as API1
+        [API Server 2] as API2
+        [WebSocket Server] as WS
+        [Load Balancer] as LB
+    }
+    
+    node "Data Tier" #LightGreen {
+        [(PostgreSQL RDS)] as RDS
+        [(Redis Cache)] as Redis
+        [S3 Object Storage] as S3
+    }
+}
+
+node "Investigator\nWorkstation" as Workstation #Pink {
+    [Web Browser] as Browser
+    [Laptop/Tablet] as Laptop
+}
+
+CAN --> CANH
+ETH --> RPi
+CANH --> RPi
+RPi --> Modem
+RPi --> GPS
+
+RPi --> OS
+OS --> Python
+Python --> App
+App --> SQLite
+
+Modem ..> LB : HTTPS/TLS 1.3
+LB --> WAF
+WAF --> API1
+WAF --> API2
+
+API1 --> RDS
+API1 --> Redis
+API1 --> S3
+API2 --> RDS
+
+API1 ..> KMS
+API2 ..> KMS
+
+RDS ..> GuardDuty
+
+Browser --> LB
+Browser --> Laptop
+
+@enduml

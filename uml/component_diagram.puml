@@ -1,0 +1,83 @@
+@startuml CEDR_Component_Diagram
+skinparam backgroundColor #FEFEFE
+skinparam componentStyle rectangle
+
+title CEDR System Component Diagram
+
+package "Vehicle (In-Vehicle Network)" {
+    [CAN Bus] as CAN
+    [Engine ECU] as ECU1
+    [Brake ECU] as ECU2
+    [Infotainment ECU] as ECU3
+    
+    package "CEDR IV-FRM Module" #LightBlue {
+        [Event Capture] as Capture
+        [Message Validator] as Validator
+        [Hash Generator] as Hasher
+        [AES-256 Encryption] as Crypto
+        [Local Storage\nSQLite] as Storage
+        [Upload Manager] as Uploader
+        [Event Queue] as Queue
+    }
+}
+
+package "Cloud Backend" #LightGreen {
+    [API Gateway] as APIGateway
+    [Authentication\nService] as Auth
+    [Event Processor] as EventProc
+    [Fleet Correlator] as Correlator
+    [(Cloud Database)] as CloudDB
+    [Audit Logger] as Audit
+    [Report Generator] as Reporter
+}
+
+package "Investigator Tools" #Pink {
+    [Web Dashboard] as Dashboard
+    [Mobile App] as Mobile
+    [Evidence Export] as Export
+}
+
+package "External Systems" #LightYellow {
+    [4G/5G/WiFi] as Telematics
+    [Hardware Security\nModule (HSM)] as HSM
+}
+
+CAN --> Capture
+ECU1 --> CAN
+ECU2 --> CAN
+ECU3 --> CAN
+
+Capture --> Validator
+Validator --> Hasher
+Hasher --> Crypto
+Crypto --> Storage
+Storage --> Queue
+Queue --> Uploader
+
+Uploader ..> Telematics : TLS 1.3
+Telematics ..> APIGateway
+
+APIGateway --> Auth
+Auth --> EventProc
+EventProc --> CloudDB
+EventProc --> Correlator
+EventProc --> Audit
+
+CloudDB --> Reporter
+Reporter --> Dashboard
+Reporter --> Mobile
+Reporter --> Export
+
+Crypto ..> HSM : Key Operations
+
+note right of Capture
+  Captures raw CAN messages
+  and network traffic
+end note
+
+note bottom of CloudDB
+  Encrypted storage with
+  automatic replication
+end note
+
+@enduml

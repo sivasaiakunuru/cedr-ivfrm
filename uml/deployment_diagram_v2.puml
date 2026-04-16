@@ -1,0 +1,154 @@
+@startuml CEDR_Deployment_Diagram_v2
+skinparam backgroundColor #FEFEFE
+
+title CEDR Deployment Architecture (Production Version)
+
+node "Vehicle Environment" as Vehicle #LightBlue {
+    
+    node "In-Vehicle Network" {
+        [CAN Bus] as CAN
+        [CAN FD Bus] as CANFD
+        [Automotive\nEthernet] as ETH
+    }
+    
+    node "CEDR Hardware (Automotive-Grade)" #LightBlue {
+        [Raspberry Pi\nCM4 Industrial] as CM4
+        [Industrial CAN\nHAT (Isolated)] as CANH
+        [NXP A71CH\nHSM] as HSM
+        [Quectel BG96\n4G/LTE Modem] as Modem
+        [u-blox NEO-M9N\nGPS/GNSS] as GPS
+        [IP67 Aluminum\nEnclosure] as Enclosure
+    }
+    
+    node "Software Stack (Secure)" #LightBlue {
+        [Secure Boot\n(U-Boot)] as SecureBoot
+        [Linux Kernel\n(dm-verity)] as Kernel
+        [Python Runtime\n(3.11+)] as Python
+        [(SQLite DB\nEncrypted)] as SQLite
+        [CEDR Application] as App
+        [TensorFlow Lite\nRuntime] as TFLite
+    }
+}
+
+node "Multi-Cloud Infrastructure" as Cloud #LightGreen {
+    
+    node "AWS (Primary Region)" #FFCCCC {
+        [AWS WAF] as WAF
+        [AWS KMS] as KMS
+        [GuardDuty] as GuardDuty
+        [EC2 API Servers] as API1
+        [Application Load\nBalancer] as ALB
+        [(PostgreSQL RDS\nMulti-AZ)] as RDS
+        [(ElastiCache\nRedis)] as Redis
+        [S3 Object\nStorage] as S3
+        [IoT Core] as IoT
+    }
+    
+    node "Azure (DR Region)" #CCE5FF {
+        [Azure API\nManagement] as AzureAPI
+        [(Azure SQL\nHyperscale)] as AzureDB
+        [Azure Monitor] as AzureMonitor
+    }
+    
+    node "GCP (Edge ML)" #CCFFCC {
+        [Cloud IoT Core] as GCPIoT
+        [(Vertex AI\nTraining)] as VertexAI
+    }
+    
+    node "Kubernetes Cluster" #E5CCFF {
+        [Kong API\nGateway] as Kong
+        [Event\nProcessors] as EventProc
+        [ML Inference\nServices] as MLService
+    }
+}
+
+node "Security Operations" as SOC #FFE5CC {
+    [eSentire SOC\n24/7 Monitoring] as eSentire
+    [Splunk SIEM] as Splunk
+    [Palo Alto XSOAR] as XSOAR
+}
+
+node "Investigator\nWorkstation" as Workstation #Pink {
+    [Web Browser\n(Chrome/Firefox)] as Browser
+    [Mobile App\n(iOS/Android)] as Mobile
+}
+
+' Vehicle connections
+CAN --> CANH
+CANFD --> CANH
+ETH --> CM4
+CANH --> CM4
+
+' Hardware connections
+CM4 --> Modem
+CM4 --> GPS
+CM4 --> HSM
+CM4 --> Enclosure
+
+' Software stack
+CM4 --> SecureBoot
+SecureBoot --> Kernel
+Kernel --> Python
+Python --> App
+App --> SQLite
+App --> TFLite
+
+' Cloud connectivity
+Modem ..> ALB : HTTPS/TLS 1.3\nCertificate Pinning
+ALB --> WAF
+WAF --> Kong
+
+' Application processing
+Kong --> EventProc
+EventProc --> RDS
+EventProc --> Redis
+EventProc --> S3
+EventProc --> MLService
+
+' Security services
+API1 --> KMS
+RDS --> GuardDuty
+EventProc ..> eSentire : Critical alerts
+
+' Multi-cloud sync
+RDS <..> AzureDB : Cross-cloud\nreplication
+
+' SOC integration
+eSentire --> Splunk
+Splunk --> XSOAR
+XSOAR --> Kong : Automated\nresponse
+
+' User access
+Browser --> Kong
+Mobile --> Kong
+
+note right of CM4
+  CM4 Industrial:
+  -20°C to +70°C
+  8GB RAM, 32GB eMMC
+  AEC-Q100 qualified
+end note
+
+note right of HSM
+  NXP A71CH:
+  Hardware key storage
+  ECDSA acceleration
+  Tamper detection
+end note
+
+note bottom of Cloud
+  Multi-cloud strategy:
+  - AWS: Primary workload
+  - Azure: DR/backup
+  - GCP: ML training
+  99.99% uptime SLA
+end note
+
+note left of SecureBoot
+  Secure boot chain:
+  ROM → U-Boot → Kernel
+  All signatures verified
+  Rollback protection
+end note
+
+@enduml

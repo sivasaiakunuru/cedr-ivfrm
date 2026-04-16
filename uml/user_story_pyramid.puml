@@ -1,0 +1,54 @@
+@startuml CEDR_Security_Story_Pyramid
+skinparam backgroundColor #FEFEFE
+skinparam rectangle {
+    BackgroundColor<<Abuse>> #FF6B6B
+    BackgroundColor<<Countermeasure>> #FFE66D
+    BackgroundColor<<Security>> #4ECDC4
+    BackgroundColor<<Functional>> #95E1D3
+    BackgroundColor<<NonFunctional>> #F38181
+}
+
+left to right direction
+
+rectangle "NON-FUNCTIONAL\n(3 Stories)\nSystem Support" as NF <<NonFunctional>> #F38181
+
+rectangle "FUNCTIONAL\n(6 Stories)\nCore Features" as FUNC <<Functional>> #95E1D3
+
+rectangle "SECURITY\n(5 Stories)\nImplement Controls" as SEC <<Security>> #4ECDC4
+
+rectangle "COUNTERMEASURE\n(5 Stories)\nPrevent Attacks" as CM <<Countermeasure>> #FFE66D
+
+rectangle "ABUSE CASES\n(5 Stories)\nBlock Attackers" as ABUSE <<Abuse>> #FF6B6B
+
+NF --> FUNC
+FUNC --> SEC
+SEC --> CM
+CM --> ABUSE
+
+note right of ABUSE
+    **Total: 24 User Stories**
+    
+    Security Coverage:
+    • Authentication (MFA)
+    • Authorization (RBAC)
+    • Encryption (AES-256)
+    • Integrity (Hash Chain)
+    • Non-Repudiation (HSM)
+end note
+
+note bottom of NF
+    US-NF-001: Performance
+    US-NF-002: Data Retention
+    US-NF-003: Cross-Platform
+end note
+
+note bottom of FUNC
+    US-F-001: Real-Time Alerts
+    US-F-002: Evidence Retrieval
+    US-F-003: Fleet Correlation
+    US-F-004: OTA Logging
+    US-F-005: Health Dashboard
+    US-F-006: Compliance Reports
+end note
+
+@enduml

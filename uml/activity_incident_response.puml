@@ -1,0 +1,50 @@
+@startuml CEDR_Activity_Incident_Response
+skinparam backgroundColor #FEFEFE
+skinparam activityBackgroundColor #LightBlue
+
+start
+
+:Security Event Detected;
+
+if (Classify Event) then (Normal)
+  :Log to Routine Queue;
+  :Batch Upload Schedule;
+  stop
+elseif (Suspicious) then (Detailed Analysis)
+  if (Threat Confirmed?) then (Yes)
+    :Mark Critical;
+  else (No - False Positive)
+    :Log to Routine Queue;
+    stop
+  endif
+else (Critical)
+  :Immediate Response;
+endif
+
+:Encrypt Event Data (AES-256);
+:Calculate Hash Chain;
+:Store in Local DB;
+
+if (Upload Strategy?) then (Critical)
+  :Immediate Cloud Upload;
+elseif (High Priority) then
+  :Add to Priority Queue;
+else (Routine)
+  :Add to Batch Queue;
+endif
+
+:Cloud Processing;
+:Verify Integrity;
+
+if (Valid?) then (Yes)
+  :Generate Alert;
+  :Notify Stakeholders;
+  :Update Dashboard;
+else (No - Invalid)
+  :Log Error;
+  :Retry Upload;
+endif
+
+stop
+
+@enduml

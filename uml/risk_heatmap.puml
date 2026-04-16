@@ -1,0 +1,73 @@
+@startuml CEDR_Risk_Heatmap
+skinparam backgroundColor #FEFEFE
+skinparam rectangle {
+    BackgroundColor<<Critical>> #DC143C
+    BackgroundColor<<High>> #FF6B35
+    BackgroundColor<<Medium>> #FFD93D
+    BackgroundColor<<Low>> #6BCB77
+}
+
+left to right direction
+
+title Risk Heat Map - Likelihood vs Impact
+
+rectangle "CRITICAL IMPACT" as Critical #DC143C
+rectangle "HIGH IMPACT" as High #FF6B35
+rectangle "MEDIUM IMPACT" as Medium #FFD93D
+rectangle "LOW IMPACT" as Low #6BCB77
+
+rectangle "Low Likelihood\n(< 20%)" as LowL
+rectangle "Medium Likelihood\n(20-50%)" as MedL
+rectangle "High Likelihood\n(> 50%)" as HighL
+
+' Risk placement
+rectangle "T-004\nKey Extraction" as T4 <<Critical>> #DC143C
+rectangle "B-001\nMarket Adoption" as B1 <<Critical>> #DC143C
+rectangle "B-002\nCompetition" as B2 <<Critical>> #DC143C
+
+rectangle "T-001\nHardware Failure" as T1 <<High>> #FF6B35
+rectangle "T-002\nStorage Full" as T2 <<High>> #FF6B35
+rectangle "O-001\nFalse Positives" as O1 <<High>> #FF6B35
+
+rectangle "T-003\nConnectivity" as T3 <<Medium>> #FFD93D
+rectangle "O-002\nAlert Fatigue" as O2 <<Medium>> #FFD93D
+rectangle "B-003\nFunding" as B3 <<Medium>> #FFD93D
+
+rectangle "C-001\nISO Compliance" as C1 <<Low>> #6BCB77
+rectangle "C-002\nUN R155" as C2 <<Low>> #6BCB77
+rectangle "S-002\nCloud Breach" as S2 <<Low>> #6BCB77
+
+' Grid layout
+Critical -[hidden]> High
+High -[hidden]> Medium
+Medium -[hidden]> Low
+
+LowL -[hidden]> MedL
+MedL -[hidden]> HighL
+
+' Position risks
+T4 ..> Critical : 8
+B1 ..> Critical : 19.5
+B2 ..> Critical : 21
+
+T1 ..> High : 21
+T2 ..> High : 12
+O1 ..> High : 12
+
+T3 ..> Medium : 12
+O2 ..> Medium : 10.5
+B3 ..> Medium : 13.5
+
+C1 ..> Low : 6
+C2 ..> Low : 6
+S2 ..> Low : 4
+
+legend right
+    |= Risk Score |= Level | Action |
+    | 20+ | Critical | Immediate |
+    | 12-19 | High | Urgent |
+    | 6-11 | Medium | Planned |
+    | < 6 | Low | Monitor |
+endlegend
+
+@enduml

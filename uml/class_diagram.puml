@@ -1,0 +1,102 @@
+@startuml CEDR_Class_Diagram
+skinparam backgroundColor #FEFEFE
+skinparam classAttributeIconSize 0
+
+title CEDR Class Diagram
+
+class Event {
+  +String eventId
+  +String vehicleId
+  +DateTime timestamp
+  +String eventType
+  +String severity
+  +String description
+  +String rawData
+  +String hash
+  +String previousHash
+  +Boolean uploaded
+  +encrypt()
+  +calculateHash()
+  +verifyIntegrity()
+}
+
+class Vehicle {
+  +String vehicleId
+  +String vin
+  +String model
+  +DateTime registeredAt
+  +String status
+  --
+  +register()
+  +getEvents()
+  +getSecurityScore()
+}
+
+class Investigator {
+  +String investigatorId
+  +String name
+  +String badge
+  +String role
+  +List~String~ authorizedVehicles
+  --
+  +authenticate()
+  +searchEvents()
+  +exportEvidence()
+}
+
+class CloudServer {
+  +String serverId
+  +String endpoint
+  --
+  +receiveEvent()
+  +verifyHMAC()
+  +storeEvent()
+  +correlateEvents()
+  +generateReport()
+}
+
+class HashChain {
+  +String genesisHash
+  +List~String~ chain
+  --
+  +addBlock()
+  +verifyChain()
+  +detectTampering()
+}
+
+class EncryptionModule {
+  +String algorithm
+  +String keyId
+  --
+  +encrypt()
+  +decrypt()
+  +rotateKey()
+}
+
+class AlertService {
+  +sendAlert()
+  +escalate()
+  +notifyDashboard()
+}
+
+class EvidencePackage {
+  +String packageId
+  +DateTime createdAt
+  +String digitalSignature
+  +String custodian
+  --
+  +generatePDF()
+  +generateJSON()
+  +verifySignature()
+}
+
+Vehicle "1" --> "*" Event : generates >
+Investigator "1" --> "*" Event : retrieves >
+Investigator "1" --> "*" EvidencePackage : creates >
+Event "*" --> "1" HashChain : part of >
+Event ..> EncryptionModule : uses >
+CloudServer "1" --> "*" Event : stores >
+CloudServer ..> AlertService : triggers >
+EvidencePackage "1" --> "*" Event : contains >
+
+@enduml

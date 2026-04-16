@@ -1,0 +1,155 @@
+@startuml CEDR_Component_Diagram_v2
+skinparam backgroundColor #FEFEFE
+skinparam componentStyle rectangle
+
+title CEDR System Component Diagram (Production Version)
+
+package "Vehicle (In-Vehicle Network)" {
+    [CAN Bus] as CAN
+    [CAN FD Bus] as CANFD
+    [Engine ECU] as ECU1
+    [Brake ECU] as ECU2
+    [Infotainment ECU] as ECU3
+    [ADAS ECU] as ECU4
+    
+    package "CEDR IV-FRM Module (CM4 Industrial)" #LightBlue {
+        [Event Capture] as Capture
+        [Message Validator] as Validator
+        [Hash Generator] as Hasher
+        [AES-256-GCM Encryption] as Crypto
+        [Local Storage\nSQLite] as Storage
+        [Upload Manager] as Uploader
+        [Event Queue] as Queue
+        [ML Inference\nTensorFlow Lite] as MLInference #LightGreen
+        [Anomaly Detection] as Anomaly #LightGreen
+    }
+    
+    package "Security Hardware" #LightYellow {
+        [NXP A71CH HSM] as HSM
+        [Secure Boot\nROM] as SecureBoot
+        [TPM 2.0] as TPM
+    }
+}
+
+package "Multi-Cloud Backend" #LightGreen {
+    
+    package "AWS (Primary)" #FFCCCC {
+        [API Gateway] as APIGateway
+        [Event Processor] as EventProc
+        [(PostgreSQL RDS)] as RDS
+        [S3 Object Storage] as S3
+    }
+    
+    package "Azure (Backup)" #CCE5FF {
+        [Azure API\nManagement] as AzureAPI
+        [(Azure SQL)] as AzureDB
+        [Azure Blob\nStorage] as AzureBlob
+    }
+    
+    package "GCP (Backup)" #CCFFCC {
+        [Cloud Endpoints] as GCPEndpoints
+        [(Cloud SQL)] as GCPDB
+        [Cloud Storage] as GCPStorage
+    }
+    
+    [Global Load Balancer] as GLB
+    [ML Training\n(Cloud)] as MLCloud
+    [Fleet Correlator] as Correlator
+    [Audit Logger] as Audit
+    [Report Generator] as Reporter
+}
+
+package "Investigator Tools" #Pink {
+    [Web Dashboard] as Dashboard
+    [Mobile App] as Mobile
+    [Evidence Export] as Export
+}
+
+package "External Systems" #LightYellow {
+    [4G/5G/WiFi] as Telematics
+    [eSentire SOC] as SOC
+    [Threat Intelligence] as ThreatIntel
+}
+
+' Vehicle internal connections
+CAN --> Capture
+CANFD --> Capture
+ECU1 --> CAN
+ECU2 --> CAN
+ECU3 --> CANFD
+ECU4 --> CANFD
+
+' Data flow within CEDR module
+Capture --> Validator
+Validator --> MLInference
+MLInference --> Anomaly
+Validator --> Hasher
+Anomaly --> Hasher : Suspicious events
+Hasher --> Crypto
+Crypto --> Storage
+Storage --> Queue
+Queue --> Uploader
+
+' Security hardware connections
+SecureBoot --> Capture : Verified boot
+HSM --> Crypto : Key operations
+TPM --> SecureBoot : Measured boot
+
+' Cloud connectivity
+Uploader ..> Telematics : TLS 1.3 + mTLS
+Telematics ..> GLB
+
+' Multi-cloud distribution
+GLB --> APIGateway
+GLB --> AzureAPI
+GLB --> GCPEndpoints
+
+' AWS processing
+APIGateway --> EventProc
+EventProc --> RDS
+EventProc --> S3
+EventProc --> MLCloud
+
+' Cross-cloud sync
+RDS <..> AzureDB : Replication
+S3 <..> AzureBlob : Replication
+
+' Backend processing
+EventProc --> Correlator
+EventProc --> Audit
+RDS --> Reporter
+
+' SOC integration
+EventProc ..> SOC : Critical alerts
+SOC ..> ThreatIntel
+
+' User interfaces
+Reporter --> Dashboard
+Reporter --> Mobile
+Reporter --> Export
+
+note right of MLInference
+  Edge ML detects anomalies
+  in real-time (<100ms)
+  before cloud upload
+end note
+
+note right of HSM
+  NXP A71CH provides
+  hardware key storage
+  FIPS 140-2 Level 2
+end note
+
+note bottom of GLB
+  Multi-cloud deployment
+  ensures 99.99% uptime
+  and prevents vendor lock-in
+end note
+
+note left of SecureBoot
+  U-Boot verifies kernel
+  signatures. dm-verity
+  protects root filesystem
+end note
+
+@enduml

@@ -1,0 +1,89 @@
+@startuml CEDR_User_Story_Map
+skinparam backgroundColor #FEFEFE
+skinparam rectangle {
+    BackgroundColor<<Functional>> LightBlue
+    BackgroundColor<<Security>> LightGreen
+    BackgroundColor<<Abuse>> LightCoral
+    BackgroundColor<<Countermeasure>> LightGoldenRodYellow
+}
+
+left to right direction
+
+rectangle "User Activities" {
+    rectangle "Monitor\nVehicle Security" as A1
+    rectangle "Respond to\nIncidents" as A2
+    rectangle "Investigate\nBreaches" as A3
+    rectangle "Maintain\nCompliance" as A4
+}
+
+rectangle "User Tasks" {
+    rectangle "View Real-Time\nAlerts" as T1
+    rectangle "Check Security\nScore" as T2
+    rectangle "Receive Critical\nNotifications" as T3
+    rectangle "Search Event\nLogs" as T4
+    rectangle "Export\nEvidence" as T5
+    rectangle "Generate Compliance\nReports" as T6
+}
+
+rectangle "User Stories" <<Functional>> {
+    rectangle "US-F-001\nReal-Time Alerts" as US1
+    rectangle "US-F-002\nEvidence Retrieval" as US2
+    rectangle "US-F-005\nVehicle Dashboard" as US3
+    rectangle "US-F-006\nCompliance Reporting" as US4
+}
+
+rectangle "Security Stories" <<Security>> {
+    rectangle "US-S-001\nTamper Evidence" as S1
+    rectangle "US-S-002\nEncryption" as S2
+    rectangle "US-S-003\nMFA" as S3
+    rectangle "US-S-004\nRBAC" as S4
+}
+
+rectangle "Abuse Stories" <<Abuse>> {
+    rectangle "US-A-001\nLog Tampering" as A1s
+    rectangle "US-A-002\nMITM Attack" as A2s
+    rectangle "US-A-003\nInsider Threat" as A3s
+}
+
+rectangle "Countermeasures" <<Countermeasure>> {
+    rectangle "US-C-001\nImmutable Audit" as C1
+    rectangle "US-C-002\nmTLS" as C2
+    rectangle "US-C-003\nDLP" as C3
+}
+
+' Connections
+A1 --> T1
+A1 --> T2
+A2 --> T3
+A3 --> T4
+A3 --> T5
+A4 --> T6
+
+T1 --> US1
+T2 --> US3
+T3 --> US1
+T4 --> US2
+T5 --> US2
+T6 --> US4
+
+US2 --> S1
+US1 --> S2
+US4 --> S4
+
+S1 ..> A1s : defends against
+S2 ..> A2s : prevents
+S4 ..> A3s : blocks
+
+A1s ..> C1 : mitigated by
+A2s ..> C2 : mitigated by
+A3s ..> C3 : mitigated by
+
+legend right
+    |= Color |= Type |
+    | <#LightBlue> | Functional |
+    | <#LightGreen> | Security |
+    | <#LightCoral> | Abuse |
+    | <#LightGoldenRodYellow> | Countermeasure |
+endlegend
+
+@enduml
