@@ -1,0 +1,27 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Create Release Archive
+      run: |
+        tar -czf cedr-ivfrm-${{ github.ref_name }}.tar.gz \
+          --exclude='.git' \
+          --exclude='.github' \
+          --exclude='__pycache__' \
+          .
+    
+    - name: Upload Release Asset
+      uses: softprops/action-gh-release@v1
+      with:
+        files: cedr-ivfrm-${{ github.ref_name }}.tar.gz
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
