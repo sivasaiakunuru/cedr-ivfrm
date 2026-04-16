@@ -20,7 +20,7 @@ jobs:
           .
     
     - name: Upload Release Asset
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v3
       with:
         files: cedr-ivfrm-${{ github.ref_name }}.tar.gz
       env:
