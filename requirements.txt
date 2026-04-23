@@ -42,7 +42,7 @@ Sphinx>=7.1.0
 sphinx-rtd-theme>=1.3.0
 
 # Development
-jupyter>=1.0.0
+jupyter>=1.1.1
 ipython>=8.14.0
 
 # Optional Hardware Support
